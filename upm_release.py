@@ -71,18 +71,35 @@ def build_upm_release():
     shutil.copytree("Src/", UPM_DIR, ignore=ignored, dirs_exist_ok=True)
     shutil.copytree("Samples/", UPM_DIR + "Samples~/", ignore=ignored, dirs_exist_ok=True)
 
-    # Create repo readme (also used for UPM) from documentation front page
+    # Create repo readme from documentation front page
+    # For this one, images should point to local ones in repo, since GitHub otherwise doesn't support large ones.
     readme = open("Documentation/README.md", "r").read()
+    # Fix image paths
+    readme = re.sub("\(./([^/]*).png", "(Documentation/\\1.png", readme)
+    readme = re.sub("\(./([^/]*).gif", "(Documentation/\\1.gif", readme)
+    # Reroute local links to online html docs
     readme = readme.replace("(./", "(https://runevision.github.io/LayerProcGen/")
+    # Change links to other markdown pages to links to generated html pages
     readme = re.sub("/([^/]*).md", "/md_\\1.html", readme)
+    # Write file with warning at top
     open("README.md", "w").write("\n\n<!-- THIS FILE IS AUTO-GENERATED FROM THE DOCS FRONT PAGE -->\n\n\n" + readme)
+
+    # Create UPM readme from documentation front page
+    # For this one, images should point to ones in online documentation.
+    readme = open("Documentation/README.md", "r").read()
+    # Reroute local links to online html docs
+    readme = readme.replace("(./", "(https://runevision.github.io/LayerProcGen/")
+    # Change links to other markdown pages to links to generated html pages
+    readme = re.sub("/([^/]*).md", "/md_\\1.html", readme)
+    # Write file with warning at top
+    open(UPM_DIR + "README.md", "w").write("\n\n<!-- THIS FILE IS AUTO-GENERATED FROM THE DOCS FRONT PAGE -->\n\n\n" + readme)
 
     # Copy other files
     shutil.copy("CHANGELOG.md", UPM_DIR + "CHANGELOG.md")
     shutil.copy("CHANGELOG.md.meta", UPM_DIR + "CHANGELOG.md.meta")
     shutil.copy("LICENSE.md", UPM_DIR + "LICENSE.md")
     shutil.copy("LICENSE.md.meta", UPM_DIR + "LICENSE.md.meta")
-    shutil.copy("README.md", UPM_DIR + "README.md")
+    #shutil.copy("README.md", UPM_DIR + "README.md")
     shutil.copy("README.md.meta", UPM_DIR + "README.md.meta")
     shutil.copy("Third Party Notices.md", UPM_DIR + "Third Party Notices.md")
     shutil.copy("Third Party Notices.md.meta", UPM_DIR + "Third Party Notices.md.meta")

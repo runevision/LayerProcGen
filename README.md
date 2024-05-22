@@ -9,7 +9,7 @@ LayerProcGen is a framework that can be used to implement layer-based procedural
 
 **[Documentation](https://runevision.github.io/LayerProcGen/) - [GitHub](https://github.com/runevision/LayerProcGen)**
 
-![](https://runevision.github.io/LayerProcGen/ContextualTransition.gif)
+![](Documentation/ContextualTransition.gif)
 
 The framework does not itself include any procedural generation algorithms. At its core, it's a way to keep track of dependencies between generation processes in a powerful spatial way.
 
