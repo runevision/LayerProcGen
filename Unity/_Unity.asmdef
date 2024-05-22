@@ -1,0 +1,26 @@
+{
+    "name": "Runevision.Unity",
+    "rootNamespace": "",
+    "references": [
+        "GUID:af01629e909984b56b6ddac3cc8fe766",
+        "GUID:eedf2b075ec794c139fc663e635ee0bb",
+        "GUID:97462eeaf6ea341848ff6b8b6119c1f0",
+        "GUID:bdf51211cba1541cca26870e4d9c763d",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "",
+            "define": "PACKAGE_UNITY_UI"
+        }
+    ],
+    "noEngineReferences": false
+}
