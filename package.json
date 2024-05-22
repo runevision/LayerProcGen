@@ -5,19 +5,19 @@
   "description": "LayerProcGen is a framework that can be used to implement layer-based procedural generation that's infinite, deterministic and contextual.",
   "license": "MPL-2.0",
   "unity": "2019.4",
-  "documentationUrl": "https://runevision.com/tech/layerprocgen/documentation/",
+  "documentationUrl": "https://runevision.github.io/LayerProcGen/",
   "dependencies": {
   },
   "samples": [
     {
       "displayName": "Simple Samples",
       "description": "Contains a few simple sample scenes including scripts.",
-      "path": "Samples~/SamplesSimple"
+      "path": "Samples~/SimpleSamples"
     },
     {
       "displayName": "Terrain Sample",
       "description": "Contains a sample scene, including scripts, for generating a terrain with natural paths.",
-      "path": "Samples~/SamplesTerrain"
+      "path": "Samples~/TerrainSample"
     }
   ],
   "keywords": [
