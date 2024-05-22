@@ -22,12 +22,12 @@ PACKAGE_JSON="""{
     {
       "displayName": "Simple Samples",
       "description": "Contains a few simple sample scenes including scripts.",
-      "path": "Samples~/SamplesSimple"
+      "path": "Samples~/SimpleSamples"
     },
     {
       "displayName": "Terrain Sample",
       "description": "Contains a sample scene, including scripts, for generating a terrain with natural paths.",
-      "path": "Samples~/SamplesTerrain"
+      "path": "Samples~/TerrainSample"
     }
   ],
   "keywords": [
