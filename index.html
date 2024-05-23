@@ -132,6 +132,7 @@ $(function(){initNavTree('index.html',''); initResizable(true); });
 <p><b>Multi-threaded</b> <br  />
  The framework is multi-threaded based on Parallel.ForEach functionality in .Net. The degree of parallelism automatically scales to the number of available cores. When needed, actions can be enqueued to be performed on the main thread.</p>
 <h1>Installation in Unity</h1>
+<p>LayerProcGen requires Unity 2019.4 or later.</p>
 <p>Install LayerProcGen as a Unity Package Manager package from this Git URL:</p>
 <p><code><a href="https://github.com/runevision/LayerProcGen.git">https://github.com/runevision/LayerProcGen.git</a>#upm</code></p>
 <p>See <a href="https://docs.unity3d.com/Manual/upm-ui-giturl.html">Unity's instructions here</a>. If you already have Git installed, it's simply these steps:</p>
@@ -141,7 +142,17 @@ $(function(){initNavTree('index.html',''); initResizable(true); });
 <li>Paste the URL: <code><a href="https://github.com/runevision/LayerProcGen.git">https://github.com/runevision/LayerProcGen.git</a>#upm</code></li>
 <li>Click <code>Add</code></li>
 </ul>
+<h2>Samples</h2>
 <p>You can also import samples for how to use the framework on the <code>Samples</code> tab of the package.</p>
+<p>The <em>Simple Samples</em> have no special requirements.</p>
+<p>The <em>Terrain Sample</em> requires:</p>
+<ul>
+<li>Burst package</li>
+<li>Input System package</li>
+<li>Player Settings: Enabling <code>Allow unsafe code</code></li>
+<li>Player Settings: Setting <code>Active Input Handling</code> to <code>Both</code></li>
+<li>Only tested with Builtin Render Pipeline</li>
+</ul>
 <h1>Platform support</h1>
 <p>The functionality should in general work on all platforms.</p>
 <p>The save-state functionality depends on the open-source FBPP (File Based Player Prefs) solution, which has been tested on Windows, MacOS, Linux, iOS and Android. Extending it to work on other platforms will likely be straightforward for someone porting a game for those platforms.</p>
