@@ -83,7 +83,7 @@ public class TerrainLODManager : MonoBehaviour {
 		// Debug draw.
 		if (debugLODBounds.visible) {
 			DebugDrawer.alpha = debugLODBounds.animAlpha;
-			var lowestLayer = layers[^1].layer;
+			var lowestLayer = layers[layers.Length - 1].layer;
 			VisualizationManager.BeginDebugDraw(lowestLayer, 0);
 			DebugDrawer.DrawRect(
 				lastLowerLevelBounds.min * lowestLayer.chunkW,

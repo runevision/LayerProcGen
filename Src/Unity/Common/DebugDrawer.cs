@@ -62,6 +62,7 @@ namespace Runevision.Common {
 		public static float alpha = 1f;
 		public static Matrix4x4 matrix = Matrix4x4.identity;
 
+		static ColorSpace colorSpace;
 		List<Line> linesZOn;
 		List<Line> linesZOff;
 		List<Line> linesZOnMultiFrame;
@@ -78,6 +79,7 @@ namespace Runevision.Common {
 			linesZOff = new List<Line>();
 			linesZOnMultiFrame = new List<Line>();
 			linesZOffMultiFrame = new List<Line>();
+			colorSpace = QualitySettings.activeColorSpace;
 		}
 
 		void SetMaterial() {
@@ -144,7 +146,8 @@ namespace Runevision.Common {
 				return;
 
 			color.a *= alpha;
-			color.a *= color.a;
+			if (colorSpace == ColorSpace.Linear)
+				color.a *= color.a;
 			start = matrix.MultiplyPoint3x4(start);
 			end = matrix.MultiplyPoint3x4(end);
 			if (duration <= 0) {
