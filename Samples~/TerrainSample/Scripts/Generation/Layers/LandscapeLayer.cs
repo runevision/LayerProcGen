@@ -86,7 +86,9 @@ public struct QueuedTerrainCallback<L, C> : IQueuedAction
 			grassDetail.minWidth = 0.4f;
 			grassDetail.maxWidth = 0.7f;
 			data.detailPrototypes = new DetailPrototype[] { grassDetail };
+			#if UNITY_2022_3_OR_NEWER
 			data.SetDetailScatterMode(DetailScatterMode.InstanceCountMode);
+			#endif
 			data.wavingGrassAmount = 0.03f;
 			data.wavingGrassSpeed = 30;
 			data.wavingGrassStrength = 4;

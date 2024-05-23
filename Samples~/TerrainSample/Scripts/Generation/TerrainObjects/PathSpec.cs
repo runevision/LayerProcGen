@@ -103,7 +103,7 @@ public class PathSpec : DeformationSpec, IPoolable {
 			for (int j = 1; j < samples; j++)
 				spline.Add(Maths.Bezier(b, b + bt, c + ct, c, (float)j / samples));
 		}
-		spline.Add(points[^1]);
+		spline.Add(points[points.Count - 1]);
 	}
 
 	public void DebugDraw(float drawPath, float drawOrigPath, float drawBounds) {
@@ -131,7 +131,7 @@ public class PathSpec : DeformationSpec, IPoolable {
 			DebugDrawer.DrawRect(
 				bounds.min,
 				bounds.max,
-				Mathf.Min(points[0].pos.y, points[^1].pos.y),
+				Mathf.Min(points[0].pos.y, points[points.Count - 1].pos.y),
 				Color.gray);
 		}
 		DebugDrawer.alpha = 1f;

@@ -45,6 +45,8 @@ The framework is multi-threaded based on Parallel.ForEach functionality in .Net.
 
 ## Installation in Unity
 
+LayerProcGen requires Unity 2019.4 or later.
+
 Install LayerProcGen as a Unity Package Manager package from this Git URL:
 
 `https://github.com/runevision/LayerProcGen.git#upm`
@@ -56,7 +58,19 @@ See [Unity's instructions here](https://docs.unity3d.com/Manual/upm-ui-giturl.ht
 - Paste the URL: `https://github.com/runevision/LayerProcGen.git#upm`
 - Click `Add`
 
+### Samples
+
 You can also import samples for how to use the framework on the `Samples` tab of the package.
+
+The *Simple Samples* have no special requirements.
+
+The *Terrain Sample* requires:
+
+- Burst package
+- Input System package
+- Player Settings: Enabling `Allow unsafe code`
+- Player Settings: Setting `Active Input Handling` to `Both`
+- Only tested with Builtin Render Pipeline
 
 ## Platform support
 

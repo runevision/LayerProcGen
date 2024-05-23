@@ -31,7 +31,7 @@ public class PriorityQueue<T> {
 	}
 
 	public T Dequeue() {
-		var result = set[^1];
+		var result = set[set.Count - 1];
 		set.RemoveAt(set.Count - 1);
 		return result.element;
 	}
