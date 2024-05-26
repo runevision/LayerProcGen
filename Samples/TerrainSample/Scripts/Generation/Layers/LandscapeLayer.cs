@@ -393,8 +393,8 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 	) {
 		// Skip edges in iteration - we need those for calculating normal only.
 		float doubleCellSize = 2f * (float)cellSize.x;
-		for (var zRes = 1; zRes <= gridResolution; zRes++) {
-			for (var xRes = 1; xRes <= gridResolution; xRes++) {
+		for (var zRes = 1; zRes <= gridResolution - 1; zRes++) {
+			for (var xRes = 1; xRes <= gridResolution - 1; xRes++) {
 				float4 current = splats[zRes, xRes];
 				GetNormal(xRes, zRes, doubleCellSize, heights, out float3 normal);
 
