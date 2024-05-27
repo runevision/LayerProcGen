@@ -55,7 +55,7 @@ def get_version():
     is_preview = False
     for line in open("CHANGELOG.md", "r").readlines():
         if line.startswith("##"):
-            version = line[2:].strip().lower().lstrip("v")
+            version = line[2:].strip().lower().lstrip("v").split(" ")[0]
             if version == "unreleased":
                 is_preview = True
                 continue
