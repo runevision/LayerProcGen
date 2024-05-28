@@ -1,3 +1,4 @@
+#if GODOT4
 using Godot;
 using Godot.Collections;
 
@@ -47,3 +48,4 @@ public partial class LayerSpec : Resource
         return properties;
     }
 }
+#endif

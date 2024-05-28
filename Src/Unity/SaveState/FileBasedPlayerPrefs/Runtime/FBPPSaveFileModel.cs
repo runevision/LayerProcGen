@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_2019_4_OR_NEWER
+using System;
 using System.Linq;
 
 [Serializable]
@@ -304,3 +305,4 @@ internal class FBPPFileModel : IEquatable<FBPPFileModel> {
         return true;
     }
 }
+#endif

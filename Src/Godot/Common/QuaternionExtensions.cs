@@ -1,3 +1,4 @@
+#if GODOT4
 using Godot;
 
 namespace Runevision.Common;
@@ -15,3 +16,4 @@ public class QuaternionExtensions
         return new Quaternion(matrix);
     }
 }
+#endif

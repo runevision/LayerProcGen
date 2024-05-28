@@ -1,3 +1,4 @@
+#if GODOT4
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -58,3 +59,4 @@ public partial class GenerationSource
         return string.Join(',', layerTypeStrings.Select(s => s[(s.LastIndexOf('.') + 1)..]));
     }
 }
+#endif

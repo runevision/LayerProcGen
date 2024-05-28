@@ -1,3 +1,4 @@
+#if GODOT4
 using Godot;
 using Runevision.Common;
 
@@ -29,3 +30,4 @@ public class TransformWrapper
         // child.gameObject.layer = transform.gameObject.layer; //same as above
     }
 }
+#endif

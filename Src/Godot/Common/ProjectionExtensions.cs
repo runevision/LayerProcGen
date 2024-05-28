@@ -1,3 +1,4 @@
+#if GODOT4
 using Godot;
 
 namespace Runevision.Common;
@@ -28,3 +29,4 @@ public static class ProjectionExtensions
         return new Projection(c0, c1, c2, c3);
     }
 }
+#endif

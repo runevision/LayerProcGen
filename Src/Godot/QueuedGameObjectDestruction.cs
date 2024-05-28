@@ -1,3 +1,4 @@
+#if GODOT4
 using Godot;
 using Runevision.LayerProcGen;
 
@@ -28,3 +29,4 @@ public class QueuedGameObjectDestruction: IQueuedAction {
         MainThreadActionQueue.Enqueue(new QueuedGameObjectDestruction { transform = tr, destroyMeshes = destroyMeshes });
     }
 }
+#endif
