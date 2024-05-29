@@ -11,9 +11,9 @@ namespace Runevision.LayerProcGen;
 [Tool]
 public partial class GenerationSource
 {
-    static string[] layerTypeStrings;
+    static string[]? layerTypeStrings;
 
-    [Export]
+    // [Export] //with export enabled the serialisation works, but not the dynamical layer name
     private string Layer
     {
         get => layer.className;
@@ -27,13 +27,34 @@ public partial class GenerationSource
         set => size = (Point)value;
     }
 
+
+    // with _get and _set enabled the "FillLayerHintString()" works, but it looses serialisation after recompiling, so serialisation is broken.
+    public override Variant _Get(StringName property) =>
+        (property + string.Empty) switch
+        {
+            nameof(Layer) => layer.className,
+            _ => base._Get(property)
+        };
+
+    public override bool _Set(StringName property, Variant value)
+    {
+        switch (property)
+        {
+            case nameof(Layer):
+                layer.className = value+"";
+                return true;
+            default:
+                return base._Set(property, value);
+        }
+    }
+
     public override Array<Dictionary> _GetPropertyList()
     {
         var properties = new Array<Dictionary>
         {
             new()
             {
-                { "name", "Layer" },
+                { "name", nameof(Layer)},
                 { "type", (int)Variant.Type.StringName },
                 { "usage", (int)PropertyUsageFlags.Default },
                 { "hint", (int)PropertyHint.Enum },
@@ -53,6 +74,7 @@ public partial class GenerationSource
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(t => t != layerBaseType && layerBaseType.IsAssignableFrom(t) && !t.IsGenericType)
                 .Select(t => t.FullName)
+                .OfType<string>()
                 .ToArray();
         }
 
