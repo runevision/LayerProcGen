@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Sets up godot_addon folder with a Unity importable version of the source.
-# Requires: sibling dir "godot_addon" set up as a git clone, checked out to branch "godot_addon".
+# Sets up godot_project folder with a Unity importable version of the source.
+# Requires: sibling dir "godot_project" set up as a git clone, checked out to branch "godot_project".
 
 import os
 import shutil
