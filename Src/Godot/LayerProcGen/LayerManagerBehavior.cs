@@ -10,6 +10,7 @@
 using Runevision.Common;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using Godot;
 
 namespace Runevision.LayerProcGen {
@@ -19,6 +20,9 @@ namespace Runevision.LayerProcGen {
     /// </summary>
     public partial class LayerManagerBehavior : Node {
 
+        protected readonly ConcurrentQueue<IEnumerator?> Coroutines = new();
+        protected IEnumerator? activeCoroutine;
+        
         public enum GenerationPlane { XY, XZ }
 
         public static LayerManagerBehavior instance { get; private set; }
@@ -49,6 +53,9 @@ namespace Runevision.LayerProcGen {
 
         public override void _Process(double delta)
         {
+            if (activeCoroutine == null || !activeCoroutine.MoveNext())
+                if (!Coroutines.TryDequeue(out activeCoroutine))
+                    activeCoroutine = null;
             MainThreadActionQueue.ProcessQueue();
             DebugDrawer.xzMode = (generationPlane == GenerationPlane.XZ);
             OnUpdate?.Invoke();
@@ -60,8 +67,9 @@ namespace Runevision.LayerProcGen {
 				debugStatusText.Text = SimpleProfiler.GetStatus();
         }
 
-        public void StartCoroutine(IEnumerator coroutine)
+        public void StartCoroutine(IEnumerator? coroutine)
         {
+            Coroutines.Enqueue(coroutine);
         }
     }
 }

@@ -12,7 +12,8 @@ public class TransformWrapper
     Node3D layerParent;
     Point chunkIndex;
 
-    public TransformWrapper(Node3D layerParent, Point chunkIndex) {
+    public TransformWrapper(Node3D layerParent, Point chunkIndex)
+    {
         this.layerParent = layerParent;
         this.chunkIndex = chunkIndex;
     }
@@ -20,13 +21,18 @@ public class TransformWrapper
     /// <summary>
     /// Creates the wrapper's own Transform if it doesn't exist, then adds the child.
     /// </summary>
-    public void AddChild(Node3D child) {
-        if (transform == null) {
-            transform = new Node3D{Name="Chunk" + chunkIndex};
+    public void AddChild(Node3D child)
+    {
+        if (transform == null)
+        {
+            transform = new Node3D { Name = "Chunk" + chunkIndex };
             layerParent.AddChild(transform);
             // transform.gameObject.layer = layerParent.gameObject.layer; -> only for collision objects in Godot, so we probably have to either change the type or make a child.
         }
-        transform.AddChild(child);
+        if (child.GetParent() == null)
+            transform.AddChild(child);
+        else
+            child.Reparent(transform);
         // child.gameObject.layer = transform.gameObject.layer; //same as above
     }
 }
