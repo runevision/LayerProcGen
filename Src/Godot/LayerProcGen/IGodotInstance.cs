@@ -5,6 +5,6 @@ namespace Runevision.LayerProcGen;
 
 internal interface IGodotInstance
 {
-    public Node LayerRoot();
+    public Node? LayerRoot();
 }
 #endif

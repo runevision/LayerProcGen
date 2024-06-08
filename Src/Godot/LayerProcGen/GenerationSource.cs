@@ -1,5 +1,8 @@
 /*
- * Copyright (c) 2024 Rune Skovbo Johansen, Sythelux Rikd
+ * Godot adaptation copyright (c) 2024 Sythelux Rikd
+ *
+ * Based on:
+ * LayerProcGen copyright (c) 2024 Rune Skovbo Johansen
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,12 +12,13 @@
 
 using Runevision.Common;
 using Godot;
+using System.Linq;
 
 
 namespace Runevision.LayerProcGen;
 
 /// <summary>
-/// Unity component that creates a <see cref="TopLayerDependency"/>.
+/// Godot component that creates a <see cref="TopLayerDependency"/>.
 /// </summary>
 
 public partial class GenerationSource : Node3D
@@ -51,8 +55,6 @@ public partial class GenerationSource : Node3D
             if (dep != null)
                 dep.isActive = false;
             dep = new TopLayerDependency(instance, size);
-            if (instance is IGodotInstance gInst)
-                CallDeferred("add_child", gInst.LayerRoot());
         }
     }
 
@@ -64,6 +66,13 @@ public partial class GenerationSource : Node3D
         if (dep == null)
             return;
 
+        foreach (IGodotInstance layer in AbstractDataLayer.layers.OfType<IGodotInstance>())
+        {
+            Node? layerRoot = layer.LayerRoot();
+            if(layerRoot != null && layerRoot.GetParent() == null)
+                CallDeferred("add_child", layerRoot); //TODO: would be cool to do this after build end
+        }
+        
         Vector3 focusPos = Position;
         Point focus;
         if (LayerManagerBehavior.instance?.generationPlane == LayerManagerBehavior.GenerationPlane.XZ)

@@ -1,5 +1,8 @@
 ﻿/*
- * Copyright (c) 2024 Rune Skovbo Johansen, Sythelux Rikd
+ * Godot adaptation copyright (c) 2024 Sythelux Rikd
+ *
+ * Based on:
+ * LayerProcGen copyright (c) 2024 Rune Skovbo Johansen
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
