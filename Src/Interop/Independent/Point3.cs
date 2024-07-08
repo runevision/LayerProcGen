@@ -7,11 +7,12 @@
  */
 
 using System;
+using System.IO;
 
 namespace Runevision.Common {
 
 	[Serializable]
-	public partial struct Point3 : IEquatable<Point3> {
+	public partial struct Point3 : IEquatable<Point3>, IBinarySerializable {
 		public int x, y, z;
 
 		public Point3(int x, int y, int z) {
@@ -143,6 +144,18 @@ namespace Runevision.Common {
 
 		public static float Distance(DPoint a, DPoint b) {
 			return (b - a).magnitude;
+		}
+
+		public void Serialize(BinaryWriter writer) {
+			writer.Write(x);
+			writer.Write(y);
+			writer.Write(z);
+		}
+
+		public void Deserialize(BinaryReader reader) {
+			x = reader.ReadInt32();
+			y = reader.ReadInt32();
+			z = reader.ReadInt32();
 		}
 	}
 
