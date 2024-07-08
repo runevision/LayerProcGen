@@ -17,23 +17,27 @@ namespace Runevision.SaveState {
 		Dictionary<System.Type, IDictionary> dicts = new Dictionary<System.Type, IDictionary>();
 
 		protected void Save(BinaryWriter writer) {
-			Serialize(GetDict<StateWrapper<bool>>(), writer);
-			Serialize(GetDict<StateWrapper<int>>(), writer);
-			Serialize(GetDict<StateWrapper<Point>>(), writer);
-			Serialize(GetDict<StateWrapper<Point3>>(), writer);
+			// TODO: Is there any way to make the list of supported types not hardcoded?
+			// Seems hard when serialization code relies on generic type parameters.
+			SerializeDictionary(GetDict<bool>(), writer);
+			SerializeDictionary(GetDict<int>(), writer);
+			SerializeDictionary(GetDict<Point>(), writer);
+			SerializeDictionary(GetDict<Point3>(), writer);
 			writer.Flush();
 		}
 
 		protected void Load(BinaryReader reader) {
 			dicts.Clear();
+			// TODO: Is there any way to make the list of supported types not hardcoded?
+			// Seems hard when serialization code relies on generic type parameters.
 			if (reader.BaseStream.Position != reader.BaseStream.Length)
-				dicts.Add(typeof(StateWrapper<bool>), DeserializeDictionary<StateWrapper<bool>>(reader));
+				dicts.Add(typeof(bool), DeserializeDictionary<bool>(reader));
 			if (reader.BaseStream.Position != reader.BaseStream.Length)
-				dicts.Add(typeof(StateWrapper<int>), DeserializeDictionary<StateWrapper<int>>(reader));
+				dicts.Add(typeof(int), DeserializeDictionary<int>(reader));
 			if (reader.BaseStream.Position != reader.BaseStream.Length)
-				dicts.Add(typeof(StateWrapper<Point>), DeserializeDictionary<StateWrapper<Point>>(reader));
-			if (reader.PeekChar() != -1)
-				dicts.Add(typeof(StateWrapper<Point3>), DeserializeDictionary<StateWrapper<Point3>>(reader));
+				dicts.Add(typeof(Point), DeserializeDictionary<Point>(reader));
+			if (reader.BaseStream.Position != reader.BaseStream.Length)
+				dicts.Add(typeof(Point3), DeserializeDictionary<Point3>(reader));
 		}
 
 		public override void Clear() {
@@ -50,11 +54,8 @@ namespace Runevision.SaveState {
 			return (Dictionary<int, T[]>)dict;
 		}
 
-		protected override void GetValues<T>(int hashKey, T[] arr) {
-			GetValues(GetDict<T>(), hashKey, arr);
-		}
-
-		protected void GetValues<T>(Dictionary<int, T[]> dict, int hashKey, T[] arr) where T : StateWrapper {
+		protected override void GetValues<T>(int hashKey, StateWrapper<T>[] arr) {
+			Dictionary<int, T[]> dict = GetDict<T>();
 			if (dict.TryGetValue(hashKey, out var stored)) {
 				if (stored.Length != arr.Length) {
 					Logg.LogWarning(string.Format(
@@ -62,59 +63,61 @@ namespace Runevision.SaveState {
 						arr.Length, stored.Length, System.Environment.StackTrace
 					));
 				}
-				else {
-					for (int i = 0; i < arr.Length; i++)
-						arr[i].objectValue = stored[i].objectValue;
-				}
+				int count = System.Math.Min (arr.Length, stored.Length);
+				for (int i = 0; i < count; i++)
+					arr[i].Value = stored[i];
 			}
 			else {
 				for (int i = 0; i < arr.Length; i++)
 					arr[i].SetDefault();
 			}
 		}
-		protected override void SetValues<T>(int hashKey, T[] arr) {
-			GetDict<T>()[hashKey] = arr;
+		protected override void SetValues<T>(int hashKey, StateWrapper<T>[] arr) {
+			Dictionary<int, T[]> dict = GetDict<T>();
+			T[] stored;
+			if (!dict.TryGetValue(hashKey, out stored) || stored.Length != arr.Length) {
+				stored = new T[arr.Length];
+				dict[hashKey] = stored;
+			}
+			for (int i = 0; i < arr.Length; i++)
+				stored[i] = arr[i].Value;
 		}
 
 		// Serialize
 
-		void Serialize<T>(Dictionary<int, T[]> dictionary, BinaryWriter writer) where T : StateWrapper {
+		void SerializeDictionary<T>(Dictionary<int, T[]> dictionary, BinaryWriter writer) where T : struct {
 			writer.Write(dictionary.Count);
 			foreach (var kvp in dictionary) {
 				writer.Write(kvp.Key);
-				Serialize(kvp.Value, writer);
+				SerializeArray(kvp.Value, writer);
 			}
 		}
 
-		void Serialize<T>(T[] array, BinaryWriter writer) where T : StateWrapper {
+		void SerializeArray<T>(T[] array, BinaryWriter writer) where T : struct {
 			writer.Write(array.Length);
 			foreach (var b in array)
 				Serialize(b, writer);
 		}
 
-		void Serialize<T>(T b, BinaryWriter writer) where T : StateWrapper {
-			if (b is StateWrapper<bool>) {
-				writer.Write((bool)(b.objectValue));
+		void Serialize<T>(T b, BinaryWriter writer) where T : struct {
+			if (b is bool) {
+				writer.Write((bool)(object)b);
+				return;
 			}
-			if (b is StateWrapper<int>) {
-				writer.Write((int)(b.objectValue));
+			if (b is int) {
+				writer.Write((int)(object)b);
+				return;
 			}
-			if (b is StateWrapper<Point>) {
-				Point point = (Point)(b.objectValue);
-				writer.Write(point.x);
-				writer.Write(point.y);
+			if (b is IBinarySerializable) {
+				((IBinarySerializable)b).Serialize(writer);
+				return;
 			}
-			if (b is StateWrapper<Point3>) {
-				Point3 point = (Point3)(b.objectValue);
-				writer.Write(point.x);
-				writer.Write(point.y);
-				writer.Write(point.z);
-			}
+			Logg.LogError("Attempting to serialize unsupported type " + typeof(T).Name);
 		}
 
 		// Deserialize
 
-		Dictionary<int, T[]> DeserializeDictionary<T>(BinaryReader reader) where T : StateWrapper {
+		Dictionary<int, T[]> DeserializeDictionary<T>(BinaryReader reader) where T : struct {
 			int count = reader.ReadInt32();
 			var dictionary = new Dictionary<int, T[]>(count);
 			for (int n = 0; n < count; n++) {
@@ -126,7 +129,7 @@ namespace Runevision.SaveState {
 			return dictionary;
 		}
 
-		T[] DeserializeArray<T>(BinaryReader reader) where T : StateWrapper {
+		T[] DeserializeArray<T>(BinaryReader reader) where T : struct {
 			int count = reader.ReadInt32();
 			T[] array = new T[count];
 			for (int n = 0; n < count; n++)
@@ -134,19 +137,20 @@ namespace Runevision.SaveState {
 			return array;
 		}
 
-		T Deserialize<T>(BinaryReader reader) where T : StateWrapper {
-			if (typeof(T) == typeof(StateWrapper<bool>)) {
-				return (T)(object)new StateWrapper<bool>(reader.ReadBoolean());
+		T Deserialize<T>(BinaryReader reader) where T : struct {
+			T b = new T();
+			if (b is bool) {
+				return (T)(object)reader.ReadBoolean();
 			}
-			if (typeof(T) == typeof(StateWrapper<int>)) {
-				return (T)(object)new StateWrapper<int>(reader.ReadInt32());
+			if (b is int) {
+				return (T)(object)reader.ReadInt32();
 			}
-			if (typeof(T) == typeof(StateWrapper<Point>)) {
-				return (T)(object)new StateWrapper<Point>(new Point(reader.ReadInt32(), reader.ReadInt32()));
+			if (b is IBinarySerializable) {
+				IBinarySerializable serializableValue = (IBinarySerializable)b;
+				serializableValue.Deserialize(reader);
+				return (T)serializableValue;
 			}
-			if (typeof(T) == typeof(StateWrapper<Point3>)) {
-				return (T)(object)new StateWrapper<Point3>(new Point3(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32()));
-			}
+			Logg.LogError("Attempting to deserialize unsupported type " + typeof(T).Name);
 			return default;
 		}
 	}

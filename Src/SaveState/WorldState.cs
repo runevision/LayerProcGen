@@ -140,8 +140,8 @@ namespace Runevision.SaveState {
 			}
 		}
 
-		protected abstract void GetValues<T>(int hashKey, T[] arr) where T : StateWrapper;
-		protected abstract void SetValues<T>(int hashKey, T[] arr) where T : StateWrapper;
+		protected abstract void GetValues<T>(int hashKey, StateWrapper<T>[] arr) where T : struct;
+		protected abstract void SetValues<T>(int hashKey, StateWrapper<T>[] arr) where T : struct;
 		public abstract void Clear();
 		public abstract void Save(string saveName);
 		public abstract void Load(string saveName);
