@@ -120,9 +120,9 @@ override int&#160;</td><td class="memItemRight" valign="bottom"><b>GetHashCode</
 <tr class="memitem:a443373b4a968ac560a619088594f0393" id="r_a443373b4a968ac560a619088594f0393"><td class="memItemLeft" align="right" valign="top"><a id="a443373b4a968ac560a619088594f0393" name="a443373b4a968ac560a619088594f0393"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDontCleanup</b> ()</td></tr>
 <tr class="separator:a443373b4a968ac560a619088594f0393"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a102d79df997e0ee1e02ccc02e175effb" id="r_a102d79df997e0ee1e02ccc02e175effb"><td class="memItemLeft" align="right" valign="top"><a id="a102d79df997e0ee1e02ccc02e175effb" name="a102d79df997e0ee1e02ccc02e175effb"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>StateObject</b> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> position, int type, params <a class="el" href="classRunevision_1_1SaveState_1_1StateWrapper.html">StateWrapper</a>[][] stateLists)</td></tr>
-<tr class="separator:a102d79df997e0ee1e02ccc02e175effb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79d78f376f17fe878cccb2d91e557e6c" id="r_a79d78f376f17fe878cccb2d91e557e6c"><td class="memItemLeft" align="right" valign="top"><a id="a79d78f376f17fe878cccb2d91e557e6c" name="a79d78f376f17fe878cccb2d91e557e6c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StateObject</b> (int hash, params <a class="el" href="classRunevision_1_1SaveState_1_1StateWrapper.html">StateWrapper</a>[][] stateLists)</td></tr>
+<tr class="separator:a79d78f376f17fe878cccb2d91e557e6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa73e7c4dd1df5fd5fbf81c7764ee1533" id="r_aa73e7c4dd1df5fd5fbf81c7764ee1533"><td class="memItemLeft" align="right" valign="top"><a id="aa73e7c4dd1df5fd5fbf81c7764ee1533" name="aa73e7c4dd1df5fd5fbf81c7764ee1533"></a>
 override string&#160;</td><td class="memItemRight" valign="bottom"><b>ToString</b> ()</td></tr>
 <tr class="separator:aa73e7c4dd1df5fd5fbf81c7764ee1533"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,24 +132,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>Unload</b> ()</td></t
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:acc83f21e925f9e7ceb6cdef3992176fd" id="r_acc83f21e925f9e7ceb6cdef3992176fd"><td class="memItemLeft" align="right" valign="top"><a id="acc83f21e925f9e7ceb6cdef3992176fd" name="acc83f21e925f9e7ceb6cdef3992176fd"></a>
-static <a class="el" href="classRunevision_1_1SaveState_1_1StateObject.html">StateObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Get&lt; T &gt;</b> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> position, int type, <a class="el" href="classRunevision_1_1SaveState_1_1StateWrapper.html">StateWrapper</a>&lt; T &gt; stateObj)</td></tr>
-<tr class="separator:acc83f21e925f9e7ceb6cdef3992176fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae849bf124aa77dcb37d3f32ee48fa8ca" id="r_ae849bf124aa77dcb37d3f32ee48fa8ca"><td class="memItemLeft" align="right" valign="top"><a id="ae849bf124aa77dcb37d3f32ee48fa8ca" name="ae849bf124aa77dcb37d3f32ee48fa8ca"></a>
+static <a class="el" href="classRunevision_1_1SaveState_1_1StateObject.html">StateObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Get&lt; T &gt;</b> (int hash, <a class="el" href="classRunevision_1_1SaveState_1_1StateWrapper.html">StateWrapper</a>&lt; T &gt; stateObj)</td></tr>
+<tr class="separator:ae849bf124aa77dcb37d3f32ee48fa8ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6424e80370ab5ca48fb2c1d31b61dac" id="r_af6424e80370ab5ca48fb2c1d31b61dac"><td class="memItemLeft" align="right" valign="top"><a id="af6424e80370ab5ca48fb2c1d31b61dac" name="af6424e80370ab5ca48fb2c1d31b61dac"></a>
 static T&#160;</td><td class="memItemRight" valign="bottom"><b>GetGlobal&lt; T &gt;</b> (int hash)</td></tr>
 <tr class="separator:af6424e80370ab5ca48fb2c1d31b61dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a851942b02ea85847093edd08cd211c66" id="r_a851942b02ea85847093edd08cd211c66"><td class="memItemLeft" align="right" valign="top"><a id="a851942b02ea85847093edd08cd211c66" name="a851942b02ea85847093edd08cd211c66"></a>
-static T&#160;</td><td class="memItemRight" valign="bottom"><b>GetGlobal&lt; T &gt;</b> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> id, int type)</td></tr>
-<tr class="separator:a851942b02ea85847093edd08cd211c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08a74c50e3130bc03c96778e9b1db9ad" id="r_a08a74c50e3130bc03c96778e9b1db9ad"><td class="memItemLeft" align="right" valign="top"><a id="a08a74c50e3130bc03c96778e9b1db9ad" name="a08a74c50e3130bc03c96778e9b1db9ad"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>SetGlobal&lt; T &gt;</b> (int hash, T value)</td></tr>
 <tr class="separator:a08a74c50e3130bc03c96778e9b1db9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd84a4b622fd414ec78720ccaabe0985" id="r_abd84a4b622fd414ec78720ccaabe0985"><td class="memItemLeft" align="right" valign="top"><a id="abd84a4b622fd414ec78720ccaabe0985" name="abd84a4b622fd414ec78720ccaabe0985"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>SetGlobal&lt; T &gt;</b> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> id, int type, params T[] values)</td></tr>
-<tr class="separator:abd84a4b622fd414ec78720ccaabe0985"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3a1a1b61f13e53beb2b7e3190316215" id="r_af3a1a1b61f13e53beb2b7e3190316215"><td class="memItemLeft" align="right" valign="top"><a id="af3a1a1b61f13e53beb2b7e3190316215" name="af3a1a1b61f13e53beb2b7e3190316215"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>SetGlobal&lt; T &gt;</b> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> id, int type, T value)</td></tr>
-<tr class="separator:af3a1a1b61f13e53beb2b7e3190316215"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
 Properties</h2></td></tr>

@@ -23,6 +23,10 @@ var hierarchy =
     ] ],
     [ "FBPPChooser", "classRunevision_1_1SaveState_1_1FBPPChooser.html", null ],
     [ "ForwardingUnityWrapper", "classRunevision_1_1Common_1_1ForwardingUnityWrapper.html", null ],
+    [ "IBinarySerializable", "interfaceRunevision_1_1Common_1_1IBinarySerializable.html", [
+      [ "Point", "structRunevision_1_1Common_1_1Point.html", null ],
+      [ "Point3", "structRunevision_1_1Common_1_1Point3.html", null ]
+    ] ],
     [ "IChunkBasedDataLayer", "interfaceRunevision_1_1LayerProcGen_1_1IChunkBasedDataLayer.html", [
       [ "ChunkBasedDataLayer< L, C >", "classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html", null ]
     ] ],

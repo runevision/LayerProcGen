@@ -111,10 +111,12 @@ $(function(){initNavTree('structRunevision_1_1Common_1_1Point.html',''); initRes
 </div><!--header-->
 <div class="contents">
 
-<p>Inherits IEquatable&lt; Point &gt;.</p>
+<p>Inherits IEquatable&lt; Point &gt;, and <a class="el" href="interfaceRunevision_1_1Common_1_1IBinarySerializable.html">IBinarySerializable</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:adb42e5e6716a1b2662fed8933342cbc2" id="r_adb42e5e6716a1b2662fed8933342cbc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb42e5e6716a1b2662fed8933342cbc2">Deserialize</a> (BinaryReader reader)</td></tr>
+<tr class="separator:adb42e5e6716a1b2662fed8933342cbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadf763f0213fc2f3875230b06bb0b6cf" id="r_aadf763f0213fc2f3875230b06bb0b6cf"><td class="memItemLeft" align="right" valign="top"><a id="aadf763f0213fc2f3875230b06bb0b6cf" name="aadf763f0213fc2f3875230b06bb0b6cf"></a>
 override bool&#160;</td><td class="memItemRight" valign="bottom"><b>Equals</b> (object obj)</td></tr>
 <tr class="separator:aadf763f0213fc2f3875230b06bb0b6cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,6 +132,8 @@ override int&#160;</td><td class="memItemRight" valign="bottom"><b>GetHashCode</
 <tr class="memitem:a6773b78ca9523d4d482ac886b41a1bfc" id="r_a6773b78ca9523d4d482ac886b41a1bfc"><td class="memItemLeft" align="right" valign="top"><a id="a6773b78ca9523d4d482ac886b41a1bfc" name="a6773b78ca9523d4d482ac886b41a1bfc"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Point</b> (int x, int y)</td></tr>
 <tr class="separator:a6773b78ca9523d4d482ac886b41a1bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a655caec7f20853655233878d3ba9c17c" id="r_a655caec7f20853655233878d3ba9c17c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a655caec7f20853655233878d3ba9c17c">Serialize</a> (BinaryWriter writer)</td></tr>
+<tr class="separator:a655caec7f20853655233878d3ba9c17c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa73e7c4dd1df5fd5fbf81c7764ee1533" id="r_aa73e7c4dd1df5fd5fbf81c7764ee1533"><td class="memItemLeft" align="right" valign="top"><a id="aa73e7c4dd1df5fd5fbf81c7764ee1533" name="aa73e7c4dd1df5fd5fbf81c7764ee1533"></a>
 override string&#160;</td><td class="memItemRight" valign="bottom"><b>ToString</b> ()</td></tr>
 <tr class="separator:aa73e7c4dd1df5fd5fbf81c7764ee1533"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -230,6 +234,45 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>this[int index]</b><co
 <a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a>&#160;</td><td class="memItemRight" valign="bottom"><b>xyo</b><code> [get]</code></td></tr>
 <tr class="separator:a4a50e06558683ce49e800d71cf54a4cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="adb42e5e6716a1b2662fed8933342cbc2" name="adb42e5e6716a1b2662fed8933342cbc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb42e5e6716a1b2662fed8933342cbc2">&#9670;&#160;</a></span>Deserialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Deserialize </td>
+          <td>(</td>
+          <td class="paramtype">BinaryReader</td>          <td class="paramname"><span class="paramname"><em>reader</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="interfaceRunevision_1_1Common_1_1IBinarySerializable.html">IBinarySerializable</a>.</p>
+
+</div>
+</div>
+<a id="a655caec7f20853655233878d3ba9c17c" name="a655caec7f20853655233878d3ba9c17c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a655caec7f20853655233878d3ba9c17c">&#9670;&#160;</a></span>Serialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Serialize </td>
+          <td>(</td>
+          <td class="paramtype">BinaryWriter</td>          <td class="paramname"><span class="paramname"><em>writer</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="interfaceRunevision_1_1Common_1_1IBinarySerializable.html">IBinarySerializable</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

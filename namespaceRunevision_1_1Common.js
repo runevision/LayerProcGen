@@ -18,6 +18,7 @@ var namespaceRunevision_1_1Common =
     [ "ForwardingUnityWrapper", "classRunevision_1_1Common_1_1ForwardingUnityWrapper.html", null ],
     [ "GridBounds", "structRunevision_1_1Common_1_1GridBounds.html", null ],
     [ "GridBounds3", "structRunevision_1_1Common_1_1GridBounds3.html", null ],
+    [ "IBinarySerializable", "interfaceRunevision_1_1Common_1_1IBinarySerializable.html", null ],
     [ "IPool", "interfaceRunevision_1_1Common_1_1IPool.html", "interfaceRunevision_1_1Common_1_1IPool" ],
     [ "IPoolable", "interfaceRunevision_1_1Common_1_1IPoolable.html", "interfaceRunevision_1_1Common_1_1IPoolable" ],
     [ "ListPool", "classRunevision_1_1Common_1_1ListPool.html", "classRunevision_1_1Common_1_1ListPool" ],
