@@ -25,6 +25,9 @@ namespace Runevision.Common {
 	/// In turn, the <see cref="SimpleProfiler.End"/> call must be supplied the handle returned by
 	/// SimpleProfiler.Begin, in order for the profiler to be able to connect matching
 	/// Begin and End calls happening simultaneously across many threads.</para>
+	/// 
+	/// <para>If you nest Begin/End calls within each other, the inner Begin call should be given
+	/// the ProfilerHandle returned by the outer Begin call as parentHandle parameter.</para>
 	///
 	/// <para>The LayerManager will call <see cref="SimpleProfiler.Log"/>
 	/// whenever generation has completed, which logs the times to the system Console
