@@ -160,6 +160,7 @@ namespace Runevision.LayerProcGen {
 			for (int i = 0; i < levelCount; i++) {
 				chunkLevels[i] = null;
 			}
+			states.Clear ();
 		}
 
 		/// <summary>

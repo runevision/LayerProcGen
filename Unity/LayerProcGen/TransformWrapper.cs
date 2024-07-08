@@ -29,14 +29,18 @@ namespace Runevision.LayerProcGen {
 		/// <summary>
 		/// Creates the wrapper's own Transform if it doesn't exist, then adds the child.
 		/// </summary>
-		public void AddChild(Transform child) {
+		public void AddChild(Transform child, bool matchParentLayer = false) {
+			// Ignore if layerParent is null. This can sometimes happen while unloading a scene.
+			if (layerParent == null)
+				return;
 			if (transform == null) {
 				transform = new GameObject("Chunk" + chunkIndex).transform;
 				transform.SetParent(layerParent, false);
 				transform.gameObject.layer = layerParent.gameObject.layer;
 			}
 			child.SetParent(transform, false);
-			child.gameObject.layer = transform.gameObject.layer;
+			if (matchParentLayer)
+				child.gameObject.layer = transform.gameObject.layer;
 		}
 	}
 

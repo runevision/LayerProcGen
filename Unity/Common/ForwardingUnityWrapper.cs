@@ -29,7 +29,7 @@ namespace Runevision.Common {
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		static void RegisterAfterSceneLoad() {
 			CallbackHub.GuaranteeInstance();
-			CallbackHub.update += () => DebugOption.UpdateAnimValues(Time.deltaTime);
+			CallbackHub.update += () => DebugOption.UpdateAnimValues(Time.unscaledDeltaTime);
 		}
 	}
 

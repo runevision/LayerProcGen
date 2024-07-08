@@ -6,6 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+ using System.Collections.Generic;
+
 namespace Runevision.SaveState {
 
 	public abstract class StateWrapper {
@@ -35,6 +37,15 @@ namespace Runevision.SaveState {
 		public override string ToString() { return Value.ToString(); }
 		public override void SetDefault() { Value = defaultValue; }
 		public override object objectValue { get { return (object)Value; } set { this.Value = (T)value; } }
+
+		static List<StateWrapper[]> temporary =
+			new List<StateWrapper[]>() { new StateWrapper<T>[] { new StateWrapper<T>() }};
+		internal static List<StateWrapper[]> GetTemporary() {
+			StateWrapper<T> temp = (StateWrapper<T>)temporary[0][0];
+			temp.value = default;
+			temp.defaultValue = default;
+			return temporary;
+		}
 	}
 
 }

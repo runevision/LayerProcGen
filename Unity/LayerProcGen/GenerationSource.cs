@@ -56,8 +56,12 @@ namespace Runevision.LayerProcGen {
 				focus = (Point)(focusPos.xz());
 			else
 				focus = (Point)(focusPos.xy());
-			dep.SetFocus(focus);
-			dep.SetSize(Point.Max(Point.one, size));
+			if (focus != dep.focus)
+				dep.SetFocus(focus);
+			
+			Point safeSize = Point.Max(Point.one, size);
+			if (dep.size != safeSize)
+				dep.SetSize(safeSize);
 		}
 	}
 
