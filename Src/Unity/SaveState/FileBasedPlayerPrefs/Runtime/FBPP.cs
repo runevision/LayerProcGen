@@ -1,3 +1,4 @@
+#if UNITY_2019_4_OR_NEWER
 using System;
 using System.Text;
 using System.IO;
@@ -276,3 +277,4 @@ public static class FBPP {
 }
 
 
+#endif
