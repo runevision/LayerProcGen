@@ -2,7 +2,10 @@
 
 LayerProcGen is a framework that can be used to implement layer-based procedural generation that's **infinite**, **deterministic** and **contextual**. It works out of the box in Unity but can be used in any C#-compatible engine.
 
-**[Documentation](https://runevision.github.io/LayerProcGen/) - [GitHub](https://github.com/runevision/LayerProcGen)**
+**[Documentation](https://runevision.github.io/LayerProcGen/) - 
+[GitHub](https://github.com/runevision/LayerProcGen) - 
+[EPC 2024 Talk](https://www.youtube.com/watch?v=4oJGkx0K8UQ) - 
+[Discussions](https://github.com/runevision/LayerProcGen/discussions)**
 
 ![](./ContextualTransition.gif)
 
@@ -37,6 +40,16 @@ The framework arranges chunks in either a horizontal or vertical plane. It can b
 
 **Multi-threaded**  
 The framework is multi-threaded based on Parallel.ForEach functionality in .Net. The degree of parallelism automatically scales to the number of available cores. When needed, actions can be enqueued to be performed on the main thread.
+
+## Made with LayerProcGen
+
+Released games:
+
+- [The Cluster](https://runevision.com/multimedia/thecluster/) (free)
+
+Games in development:
+
+- [The Big Forest (working title)](https://runevision.com/multimedia/thebigforest/)
 
 ## Installation in Unity
 
