@@ -404,8 +404,8 @@ namespace Runevision.LayerProcGen {
 		/// output the <paramref name="chunk"/> and <paramref name="localPointInChunk"/> of the given global <paramref name="gridPoint"/>.
 		/// If iterating over many grid points, consider instead using <see cref="HandleGridPoints"/>.
 		/// </summary>
-		protected bool GetChunkOfGridPoint(ILC q, Point gridPoint, Point chunkGridSize, out C chunk, out Point localPointInChunk) {
-			return GetChunkOfGridPoint(q, gridPoint.x, gridPoint.y, chunkGridSize.x, chunkGridSize.y, out chunk, out localPointInChunk);
+		protected C? GetChunkOfGridPoint(ILC q, Point gridPoint, Point chunkGridSize, out Point localPointInChunk) {
+			return GetChunkOfGridPoint(q, gridPoint.x, gridPoint.y, chunkGridSize.x, chunkGridSize.y, out localPointInChunk);
 		}
 
 		/// <summary>
@@ -413,15 +413,15 @@ namespace Runevision.LayerProcGen {
 		/// output the <paramref name="chunk"/> and <paramref name="localPointInChunk"/> of the given global point.
 		/// If iterating over many grid points, consider instead using <see cref="HandleGridPoints"/>.
 		/// </summary>
-		protected bool GetChunkOfGridPoint(ILC q, int x, int y, int chunkGridW, int chunkGridH, out C chunk, out Point localPointInChunk) {
+		protected C? GetChunkOfGridPoint(ILC q, int x, int y, int chunkGridW, int chunkGridH, out Point localPointInChunk) {
 			Point chunkIndex = new Point(
 				Crd.Div(x, chunkGridW),
 				Crd.Div(y, chunkGridH)
 			);
-			chunk = TryGetChunk(chunkIndex, 0);
+			C chunk = TryGetChunk(chunkIndex, 0);
 			if (chunk != null) {
 				localPointInChunk = new Point(x - chunkIndex.x * chunkGridW, y - chunkIndex.y * chunkGridH);
-				return true;
+				return chunk;
 			}
 			if (q != null) {
 				int cellW = chunkW / chunkGridW;
@@ -430,7 +430,7 @@ namespace Runevision.LayerProcGen {
 				WarnAboutMissingDependencies(q, requested);
 			}
 			localPointInChunk = Point.zero;
-			return false;
+			return null;
 		}
 
 		protected delegate void HandleGridPointInChunk(C chunk, Point localPointInChunk, Point globalPoint);

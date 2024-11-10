@@ -513,10 +513,13 @@ public abstract class LandscapeLayer<L, C> : ChunkBasedDataLayer<L, C>
 	}
 
 	public Terrain GetTerrainAtWorldPos(Vector3 worldPos) {
-		if (GetChunkOfGridPoint(null,
+		let chunk = GetChunkOfGridPoint(
+			null,
 			Mathf.FloorToInt(worldPos.x), Mathf.FloorToInt(worldPos.z),
-			chunkW, chunkH, out C chunk, out Point point)
-		) {
+			chunkW, chunkH,
+			out Point point
+		);
+		if (chunk != null) {
 			return chunk.chunkParent.transform.GetComponentInChildren<Terrain>();
 		}
 		return null;
