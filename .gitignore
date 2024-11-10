@@ -27,3 +27,4 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+obj/
