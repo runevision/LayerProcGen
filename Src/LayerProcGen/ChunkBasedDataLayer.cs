@@ -130,11 +130,13 @@ namespace Runevision.LayerProcGen {
 		/// Try to get the chunk at the specified index.
 		/// </summary>
 		/// <param name="index">An integer coordinate that indexes into the grid of chunks.</param>
-		/// <param name="chunk">The requested chunk, or null.</param>
-		/// <returns>True if the chunk exists and has been generated to at least level 0.</returns>
-		protected bool TryGetChunk(Point index, out C chunk, int level) {
-			chunk = chunks[index];
-			return (chunk != null && chunk.level >= level);
+		/// <returns>The chunk if the chunk exists and has been generated to at least the given level.</returns>
+		protected C? TryGetChunk(Point index, int level) {
+			C chunk = chunks[index];
+			if (chunk != null && chunk.level >= level) {
+				return chunk;
+			}
+			return null;
 		}
 
 		void CreateAndRegisterChunk(Point index, int level) {
@@ -416,7 +418,8 @@ namespace Runevision.LayerProcGen {
 				Crd.Div(x, chunkGridW),
 				Crd.Div(y, chunkGridH)
 			);
-			if (TryGetChunk(chunkIndex, out chunk, 0)) {
+			chunk = TryGetChunk(chunkIndex, 0);
+			if (chunk != null) {
 				localPointInChunk = new Point(x - chunkIndex.x * chunkGridW, y - chunkIndex.y * chunkGridH);
 				return true;
 			}
@@ -507,7 +510,7 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		public bool IsLoadedAtPosition(DPoint position, int level) {
 			var chunkIndex = new Point(Crd.Div((int)position.x, chunkW), Crd.Div((int)position.y, chunkH));
-			return TryGetChunk(chunkIndex, out C _, level);
+			return TryGetChunk(chunkIndex, level) != null;
 		}
 	}
 
