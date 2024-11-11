@@ -180,9 +180,9 @@ delegate void&#160;</td><td class="memItemRight" valign="bottom"><b>HandleGridPo
 void&#160;</td><td class="memItemRight" valign="bottom"><b>HandleGridPoints</b> (<a class="el" href="interfaceRunevision_1_1LayerProcGen_1_1ILC.html">ILC</a> q, <a class="el" href="structRunevision_1_1Common_1_1GridBounds.html">GridBounds</a> gridBounds, <a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> chunkGridSize, HandleGridPointInChunk handler, bool callForNullChunks=false)</td></tr>
 <tr class="memdesc:a99c32d6ff1770619c62f1bc6dc031518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assuming an infinite grid with a resolution per chunk of <em>chunkGridSize</em> , call the handler function once for each of the grid points within the <em>gridBounds</em> . This is more efficient than calling GetChunkOfGridPoint for each grid point. <br /></td></tr>
 <tr class="separator:a99c32d6ff1770619c62f1bc6dc031518"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c24def9d333c0c2aa62b9e44fade6ca" id="r_a5c24def9d333c0c2aa62b9e44fade6ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c24def9d333c0c2aa62b9e44fade6ca">TryGetChunk</a> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> index, out C chunk)</td></tr>
-<tr class="memdesc:a5c24def9d333c0c2aa62b9e44fade6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to get the chunk at the specified index.  <br /></td></tr>
-<tr class="separator:a5c24def9d333c0c2aa62b9e44fade6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d699300fb07a067d89195b5aea0101f" id="r_a0d699300fb07a067d89195b5aea0101f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d699300fb07a067d89195b5aea0101f">TryGetChunk</a> (<a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a> index, out C chunk, int level=0)</td></tr>
+<tr class="memdesc:a0d699300fb07a067d89195b5aea0101f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to get the chunk at the specified index.  <br /></td></tr>
+<tr class="separator:a0d699300fb07a067d89195b5aea0101f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa39b7a917e436c13e97e98dc0251acea" id="r_aa39b7a917e436c13e97e98dc0251acea"><td class="memItemLeft" align="right" valign="top"><a id="aa39b7a917e436c13e97e98dc0251acea" name="aa39b7a917e436c13e97e98dc0251acea"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>WarnAboutMissingDependencies</b> (<a class="el" href="interfaceRunevision_1_1LayerProcGen_1_1ILC.html">ILC</a> q, <a class="el" href="structRunevision_1_1Common_1_1GridBounds.html">GridBounds</a> requested)</td></tr>
 <tr class="memdesc:aa39b7a917e436c13e97e98dc0251acea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call this method if a chunk <em>q</em>  has called methods that rely on other chunks that are not currently generated. Based on the bounds of q and the <em>requested</em>  world bounds of the current layer, the method will calculate which layer dependency has to be added to ensure the required chunks are generated in time. <br /></td></tr>
@@ -426,8 +426,8 @@ static IEnumerable&lt; <a class="el" href="classRunevision_1_1LayerProcGen_1_1Ab
 
 </div>
 </div>
-<a id="a5c24def9d333c0c2aa62b9e44fade6ca" name="a5c24def9d333c0c2aa62b9e44fade6ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c24def9d333c0c2aa62b9e44fade6ca">&#9670;&#160;</a></span>TryGetChunk()</h2>
+<a id="a0d699300fb07a067d89195b5aea0101f" name="a0d699300fb07a067d89195b5aea0101f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d699300fb07a067d89195b5aea0101f">&#9670;&#160;</a></span>TryGetChunk()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -443,7 +443,12 @@ static IEnumerable&lt; <a class="el" href="classRunevision_1_1LayerProcGen_1_1Ab
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">out C</td>          <td class="paramname"><span class="paramname"><em>chunk</em></span>&#160;)</td>
+          <td class="paramtype">out C</td>          <td class="paramname"><span class="paramname"><em>chunk</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>level</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
   </td>
