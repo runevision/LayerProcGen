@@ -164,8 +164,7 @@ namespace Runevision.LayerProcGen {
 		}
 
 		internal sealed override void RemoveChunkLevel(Point index, int level) {
-			C chunk = chunks[index];
-			if (chunk != null) {
+			if (chunks[index] is C chunk) {
 				if (level == 0) {
 					lock (chunks) {
 						foreach (StateObject state in chunk.states)
@@ -384,8 +383,7 @@ namespace Runevision.LayerProcGen {
 			lock (chunks) {
 				for (int x = minChunkIndex.x; x < maxChunkIndex.x; x++) {
 					for (int y = minChunkIndex.y; y < maxChunkIndex.y; y++) {
-						C chunk = chunks[x, y];
-						if (chunk != null && chunk.level >= minChunkLevel)
+						if (chunks[x, y] is C chunk && chunk.level >= minChunkLevel)
 							func(chunk);
 						else
 							missingAnyChunks = true;
@@ -461,8 +459,7 @@ namespace Runevision.LayerProcGen {
 						int gridYMax = Math.Min(gridBounds.max.y - chunkGridSize.y * j, chunkGridSize.y);
 
 						Point chunkOrigin = new Point(i * chunkGridSize.x, j * chunkGridSize.y);
-						C chunk = chunks[i, j];
-						if (chunk != null && chunk.level >= 0) {
+						if (chunks[i, j] is C chunk && chunk.level >= 0) {
 							// Iterate over grid points in chunk.
 							for (int x = gridXMin; x < gridXMax; x++) {
 								for (int y = gridYMin; y < gridYMax; y++) {
