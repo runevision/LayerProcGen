@@ -146,9 +146,6 @@ namespace Runevision.LayerProcGen {
 
 			var ph = SimpleProfiler.Begin($"{GetType().Name} {level} Chunk");
 			C chunk = chunks[index];
-			if (chunk == null) {
-				Logg.LogError("Chunk is null in CreateAndRegisterChunk");
-			}
 
 			if (chunk.level < level) {
 				if (chunk.level != level - 1)
