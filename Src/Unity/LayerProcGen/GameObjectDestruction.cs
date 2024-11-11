@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-
+#if UNITY_2019_4_OR_NEWER
 using Runevision.Common;
 
 namespace Runevision.LayerProcGen {
@@ -39,5 +39,5 @@ namespace Runevision.LayerProcGen {
 			MainThreadActionQueue.Enqueue(new QueuedGameObjectDestruction { transform = tr, destroyMeshes = destroyMeshes });
 		}
 	}
-
 }
+#endif

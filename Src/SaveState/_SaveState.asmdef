@@ -1,0 +1,16 @@
+{
+    "name": "Runevision.WorldState",
+    "references": [
+        "GUID:af01629e909984b56b6ddac3cc8fe766",
+        "GUID:bdf51211cba1541cca26870e4d9c763d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

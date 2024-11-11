@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-#if UNITY_2019_4_OR_NEWER
+#if GODOT4
 
 using System.Collections.Generic;
-using UnityEngine;
+using Godot;
 
 namespace Runevision.Common {
 
@@ -20,7 +20,7 @@ namespace Runevision.Common {
 	/// Vector2 parameters draw in either the XY or XZ plane depending on whether
 	/// the xzMode property is set to true.
 	/// </remarks>
-	public class DebugDrawer : MonoBehaviour {
+	public partial class DebugDrawer : Node {
 		struct Line {
 			public Vector3 start;
 			public Vector3 end;
@@ -41,9 +41,7 @@ namespace Runevision.Common {
 			}
 
 			public void Draw() {
-				GL.Color(color);
-				GL.Vertex(start);
-				GL.Vertex(end);
+				DebugDraw3D.DrawLine(start, end, color, duration);
 			}
 		}
 
@@ -51,58 +49,66 @@ namespace Runevision.Common {
 		public static bool xzMode = false;
 
 		static DebugDrawer s_Instance;
-		static Material s_MatZOn;
-		static Material s_MatZOff;
+		static ShaderMaterial s_MatZOn;
+		static ShaderMaterial s_MatZOff;
 		static float s_LastTime = -1;
 
+		[Export]
 		public bool display = true;
-		public LayerMask debugLayers = ~0;
+		[Export(PropertyHint.Layers3DPhysics)]
+		public long debugLayers = ~0;
+		[Export]
 		public Shader shaderZOn;
+		[Export]
 		public Shader shaderZOff;
 
 		public static float alpha = 1f;
-		public static Matrix4x4 matrix = Matrix4x4.identity;
+		public static Projection matrix = Projection.Identity;
 
-		static ColorSpace colorSpace;
-		List<Line> linesZOn;
-		List<Line> linesZOff;
+		static Gradient.ColorSpace colorSpace;
+		// List<Line> linesZOn;
+		// List<Line> linesZOff;
 		List<Line> linesZOnMultiFrame;
 		List<Line> linesZOffMultiFrame;
 
-		void Awake() {
-			if (s_Instance) {
-				DestroyImmediate(this);
+		public override void _EnterTree() {
+			if (s_Instance != null) {
+				this.QueueFree();
+				// DestroyImmediate(this);
 				return;
 			}
 			s_Instance = this;
 			SetMaterial();
-			linesZOn = new List<Line>();
-			linesZOff = new List<Line>();
+			// linesZOn = new List<Line>();
+			// linesZOff = new List<Line>();
 			linesZOnMultiFrame = new List<Line>();
 			linesZOffMultiFrame = new List<Line>();
-			colorSpace = QualitySettings.activeColorSpace;
+			colorSpace = Gradient.ColorSpace.LinearSrgb;
+			//  TODO: colorSpace = QualitySettings.activeColorSpace;
 		}
 
 		void SetMaterial() {
-			s_MatZOn = new Material(shaderZOn);
-			s_MatZOn.hideFlags = HideFlags.HideAndDontSave;
-			s_MatZOff = new Material(shaderZOff);
-			s_MatZOff.hideFlags = HideFlags.HideAndDontSave;
+			s_MatZOn = new ShaderMaterial();
+			s_MatZOn.Shader = shaderZOn;
+			// s_MatZOn.hideFlags = HideFlags.HideAndDontSave; //TODO
+			s_MatZOff = new ShaderMaterial();
+			s_MatZOff.Shader = shaderZOff;
+			// s_MatZOff.hideFlags = HideFlags.HideAndDontSave; //TODO
 		}
 
-		void Update() {
-			linesZOn.Clear();
-			linesZOff.Clear();
+		public override void _Process(double deltaTime) {
+			// linesZOn.Clear();
+			// linesZOff.Clear();
 			CullList(linesZOnMultiFrame);
 			CullList(linesZOffMultiFrame);
-			s_LastTime = Time.time;
+			s_LastTime = (float)deltaTime;
 		}
 
 		void CullList(List<Line> list) {
 			lock (list) {
 				for (int i = list.Count - 1; i >= 0; i--) {
 					if (list[i].DurationElapsed()) {
-						list[i] = list[list.Count - 1];
+						list[i] = list[^1];
 						list.RemoveAt(list.Count - 1);
 					}
 				}
@@ -112,20 +118,20 @@ namespace Runevision.Common {
 		void OnRenderObject() {
 			if (!display)
 				return;
-			if ((Camera.current.cullingMask & debugLayers) == 0)
-				return;
+			// if ((Camera.current.cullingMask & debugLayers) == 0) //TODO
+			// 	return;
 
-			s_MatZOn.SetPass(0);
-			GL.Begin(GL.LINES);
-			DrawList(linesZOn);
+			 s_MatZOn.Shader.Set("Pass",0); //TODO: s_MatZOn.SetPass(0);
+			// GL.Begin(GL.LINES);
+			// DrawList(linesZOn);
 			DrawList(linesZOnMultiFrame);
-			GL.End();
+			// GL.End();
 
-			s_MatZOff.SetPass(0);
-			GL.Begin(GL.LINES);
-			DrawList(linesZOff);
+			s_MatZOff.Shader.Set("Pass",0); //TODO: s_MatZOff.SetPass(0);
+			// GL.Begin(GL.LINES);
+			// DrawList(linesZOff);
 			DrawList(linesZOffMultiFrame);
-			GL.End();
+			// GL.End();
 		}
 
 		void DrawList(List<Line> lines) {
@@ -136,7 +142,7 @@ namespace Runevision.Common {
 		}
 
 		public static void DrawLine(Vector3 start, Vector3 end) {
-			DrawLine(start, end, Color.white);
+			DrawLine(start, end, Colors.White);
 		}
 
 		public static void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false) {
@@ -146,22 +152,28 @@ namespace Runevision.Common {
 			if (start == end)
 				return;
 
-			color.a *= alpha;
-			if (colorSpace == ColorSpace.Linear)
-				color.a *= color.a;
+			color.A *= alpha;
+			if (colorSpace == Gradient.ColorSpace.LinearSrgb)
+				color.A *= color.A;
 			start = matrix.MultiplyPoint3x4(start);
 			end = matrix.MultiplyPoint3x4(end);
-			if (duration <= 0) {
-				if (depthTest) {
-					lock (s_Instance.linesZOn) {
-						s_Instance.linesZOn.Add(new Line(start, end, color, s_LastTime, duration));
-					}
-				}
-				else {
-					lock (s_Instance.linesZOff) {
-						s_Instance.linesZOff.Add(new Line(start, end, color, s_LastTime, duration));
-					}
-				}
+			if (duration <= 0)
+			{
+				DebugDraw3D.DrawLine(start, end, color, duration);
+
+				// if (depthTest) //TODO: not implemented by DebugDraw3D, yet: https://github.com/DmitriySalnikov/godot_debug_draw_3d/issues/44
+				// {
+				// 	DebugDraw3D.DrawLine(start, end, color, duration);
+					// lock (s_Instance.linesZOn) {
+					// 	s_Instance.linesZOn.Add(new Line(start, end, color, s_LastTime, duration));
+					// }
+				// }
+				// else {
+					// lock (s_Instance.linesZOff)
+					// {
+					// 	s_Instance.linesZOff.Add(new Line(start, end, color, s_LastTime, duration));
+					// }
+				// }
 			}
 			else {
 				if (depthTest) {
@@ -180,11 +192,11 @@ namespace Runevision.Common {
 		// Draw a line from start to start + dir with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the ray is rendered 1 frame.
 		public static void DrawRay(Vector3 start, Vector3 dir) {
-			DrawLine(start, start + dir, Color.white);
+			DrawLine(start, start + dir, Colors.White);
 		}
 
 		public static void DrawRay(Vector3 start, Vector3 dir, Color color, float duration = 0, bool depthTest = false) {
-			if (dir == Vector3.zero)
+			if (dir == Vector3.Zero)
 				return;
 			DrawLine(start, start + dir, color, duration, depthTest);
 		}
@@ -196,45 +208,45 @@ namespace Runevision.Common {
 		public static void DrawRect(Vector2 min, Vector2 max, float depth, Color color) {
 			if (xzMode) {
 				DrawLine(
-					new Vector3(min.x, depth, min.y),
-					new Vector3(min.x, depth, max.y),
+					new Vector3(min.X, depth, min.Y),
+					new Vector3(min.X, depth, max.Y),
 					color
 				);
 				DrawLine(
-					new Vector3(max.x, depth, min.y),
-					new Vector3(max.x, depth, max.y),
+					new Vector3(max.X, depth, min.Y),
+					new Vector3(max.X, depth, max.Y),
 					color
 				);
 				DrawLine(
-					new Vector3(min.x, depth, min.y),
-					new Vector3(max.x, depth, min.y),
+					new Vector3(min.X, depth, min.Y),
+					new Vector3(max.X, depth, min.Y),
 					color
 				);
 				DrawLine(
-					new Vector3(min.x, depth, max.y),
-					new Vector3(max.x, depth, max.y),
+					new Vector3(min.X, depth, max.Y),
+					new Vector3(max.X, depth, max.Y),
 					color
 				);
 			}
 			else {
 				DrawLine(
-					new Vector3(min.x, min.y, depth),
-					new Vector3(min.x, max.y, depth),
+					new Vector3(min.X, min.Y, depth),
+					new Vector3(min.X, max.Y, depth),
 					color
 				);
 				DrawLine(
-					new Vector3(max.x, min.y, depth),
-					new Vector3(max.x, max.y, depth),
+					new Vector3(max.X, min.Y, depth),
+					new Vector3(max.X, max.Y, depth),
 					color
 				);
 				DrawLine(
-					new Vector3(min.x, min.y, depth),
-					new Vector3(max.x, min.y, depth),
+					new Vector3(min.X, min.Y, depth),
+					new Vector3(max.X, min.Y, depth),
 					color
 				);
 				DrawLine(
-					new Vector3(min.x, max.y, depth),
-					new Vector3(max.x, max.y, depth),
+					new Vector3(min.X, max.Y, depth),
+					new Vector3(max.X, max.Y, depth),
 					color
 				);
 			}
@@ -242,9 +254,9 @@ namespace Runevision.Common {
 
 		static Vector3 Mode(Vector2 pos) {
 			if (xzMode)
-				return new Vector3(pos.x, 0, pos.y);
+				return new Vector3(pos.X, 0, pos.Y);
 			else
-				return new Vector3(pos.x, pos.y, 0);
+				return new Vector3(pos.X, pos.Y, 0);
 		}
 
 		public static void DrawCross(Vector2 pos, float size, Color color, float duration = 0, bool depthTest = false) {
@@ -257,7 +269,7 @@ namespace Runevision.Common {
 		}
 
 		public static void DrawCircle(Vector2 pos, float radius, int segments, Color color, float duration = 0, bool depthTest = false) {
-			Vector2 p1 = Vector2.right * radius + pos;
+			Vector2 p1 = Vector2.Right * radius + pos;
 			for (int i = 0; i < segments; i++) {
 				Vector2 p2 = CirclePoint((i + 1f) / segments) * radius + pos;
 				DrawLine(Mode(p1), Mode(p2), color, duration, depthTest);
@@ -266,18 +278,18 @@ namespace Runevision.Common {
 		}
 
 		public static void DrawCircle(Vector3 pos, float radius, int segments, Color color, float duration = 0, bool depthTest = false) {
-			Vector3 p1 = Vector3.right * radius + pos;
+			Vector3 p1 = Vector3.Right * radius + pos;
 			for (int i = 0; i < segments; i++) {
-				Vector3 rot = Vector3.zero;
+				Vector3 rot = Vector3.Zero;
 				rot[xzMode ? 1 : 2] = (i + 1f) * 360f / segments;
-				Vector3 p2 = Quaternion.Euler(rot) * Vector3.right * radius + pos;
+				Vector3 p2 = Quaternion.FromEuler(rot) * Vector3.Right * radius + pos;
 				DrawLine(p1, p2, color, duration, depthTest);
 				p1 = p2;
 			}
 		}
 
 		static Vector2 CirclePoint(float fraction) {
-			float f = fraction * 2 * Mathf.PI;
+			float f = fraction * 2 * Mathf.Pi;
 			return new Vector2(Mathf.Cos(f), Mathf.Sin(f));
 		}
 
@@ -290,11 +302,11 @@ namespace Runevision.Common {
 		// Draw an arrow from start to start + dir with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the arrow is rendered 1 frame.
 		public static void DrawArrow(Vector3 start, Vector3 dir, Color color, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20, float duration = 0, bool depthTest = false) {
-			if (dir == Vector3.zero)
+			if (dir == Vector3.Zero)
 				return;
 			DrawRay(start, dir, color, duration, depthTest);
-			Vector3 right = Quaternion.LookRotation(dir) * Quaternion.Euler(0, 180 + arrowHeadAngle, 0) * Vector3.forward;
-			Vector3 left = Quaternion.LookRotation(dir) * Quaternion.Euler(0, 180 - arrowHeadAngle, 0) * Vector3.forward;
+			Vector3 right = QuaternionExtensions.LookRotation(dir) * Quaternion.FromEuler(new Vector3(0, 180 + arrowHeadAngle, 0)) * Vector3.Forward;
+			Vector3 left = QuaternionExtensions.LookRotation(dir) * Quaternion.FromEuler(new Vector3(0, 180 - arrowHeadAngle, 0)) * Vector3.Forward;
 			DrawRay(start + dir, right * arrowHeadLength, color, duration, depthTest);
 			DrawRay(start + dir, left * arrowHeadLength, color, duration, depthTest);
 		}
@@ -302,12 +314,13 @@ namespace Runevision.Common {
 		// Draw a square with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the square is renderer 1 frame.
 		public static void DrawSquare(Vector3 pos, Vector3 scale, Color color, Vector3? rot = null, float duration = 0, bool depthTest = false) {
-			DrawSquare(Matrix4x4.TRS(pos, Quaternion.Euler(rot ?? Vector3.zero), scale), color, duration, depthTest);
+			
+			DrawSquare(ProjectionExtensions.TRS(pos, Quaternion.FromEuler(rot ?? Vector3.Zero), scale), color, duration, depthTest);
 		}
 
 		// Draw a square with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the square is renderer 1 frame.
-		public static void DrawSquare(Matrix4x4 matrix, Color color, float duration = 0, bool depthTest = false) {
+		public static void DrawSquare(Projection matrix, Color color, float duration = 0, bool depthTest = false) {
 			Vector3
 			p1 = matrix.MultiplyPoint3x4(new Vector3(.5f, 0, .5f)),
 			p2 = matrix.MultiplyPoint3x4(new Vector3(.5f, 0, -.5f)),
@@ -323,12 +336,12 @@ namespace Runevision.Common {
 		// Draw a cube with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the square is renderer 1 frame.
 		public static void DrawCube(Vector3 pos, Vector3 scale, Color color, Vector3? rot = null, float duration = 0, bool depthTest = false) {
-			DrawCube(Matrix4x4.TRS(pos, Quaternion.Euler(rot ?? Vector3.zero), scale), color, duration, depthTest);
+			DrawCube(ProjectionExtensions.TRS(pos, Quaternion.FromEuler(rot ?? Vector3.Zero), scale), color, duration, depthTest);
 		}
 
 		// Draw a cube with color for a duration of time and with or without depth testing.
 		// If duration is 0 then the square is renderer 1 frame.
-		public static void DrawCube(Matrix4x4 matrix, Color color, float duration = 0, bool depthTest = false) {
+		public static void DrawCube(Projection matrix, Color color, float duration = 0, bool depthTest = false) {
 			Vector3
 			down1 = matrix.MultiplyPoint3x4(new Vector3(.5f, -.5f, .5f)),
 			down2 = matrix.MultiplyPoint3x4(new Vector3(.5f, -.5f, -.5f)),
