@@ -137,15 +137,14 @@ namespace Runevision.LayerProcGen {
 			return (chunk != null && chunk.level >= level);
 		}
 
-		void CreateAndRegisterChunk(Point index, int level) {
+		void CreateAndRegisterChunk(C chunk, int level) {
 			ChunkLevelData levelData = ObjectPool<ChunkLevelData>.GlobalGet();
-			EnsureChunkProviders(index, level, levelData);
+			EnsureChunkProviders(chunk.index, level, levelData);
 
 			if (LayerManager.instance.aborting)
 				return;
 
 			var ph = SimpleProfiler.Begin($"{GetType().Name} {level} Chunk");
-			C chunk = chunks[index];
 
 			if (chunk.level < level) {
 				if (chunk.level != level - 1)
@@ -239,8 +238,8 @@ namespace Runevision.LayerProcGen {
 				return;
 
 			// Load inside bounds.
-			GridBounds indices = bounds.GetDivided(chunkSize);
-			List<Point> createIndices = new List<Point>();
+			GridBounds indices = bounds.GetDivided(new Point(chunkW, chunkH));
+			List<C> createChunks = new List<C>();
 			List<Point> dependIndices = new List<Point>();
 			for (int x = indices.min.x; x < indices.max.x; x++) {
 				for (int y = indices.min.y; y < indices.max.y; y++) {
@@ -256,30 +255,30 @@ namespace Runevision.LayerProcGen {
 						}
 					}
 					if (chunk.level < level) {
-						createIndices.Add(index);
+						createChunks.Add(chunk);
 						WorkTracker.AddWorkNeeded(1, GetType());
 					}
 				}
 			}
 
 			Point center = bounds.center;
-			createIndices = createIndices.OrderBy(i => (i * chunkSize - center).sqrMagnitude).ToList();
+			createChunks = createChunks.OrderBy(chunk => (chunk.index * chunkSize - center).sqrMagnitude).ToList();
 
 			if (!LayerManager.instance.useParallelThreads) {
-				foreach (Point index in createIndices) {
-					CreateAndRegisterChunk(index, level);
+				foreach (C chunk in createChunks) {
+					CreateAndRegisterChunk(chunk, level);
 					WorkTracker.AddWorkDone(1, GetType());
 				}
 			}
 			else {
-				Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(createIndices),
-					index => {
+				Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(createChunks),
+					chunk => {
 						if (LayerManager.instance.aborting)
 							return;
-						SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {index}");
-						lock (chunks[index].levelLocks[level]) {
-							if (chunks[index].level < level)
-								CreateAndRegisterChunk(index, level);
+						SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {chunk.index}");
+						lock (chunk.levelLocks[level]) {
+							if (chunk.level < level)
+								CreateAndRegisterChunk(chunk, level);
 							WorkTracker.AddWorkDone(1, GetType());
 						}
 						SimpleProfiler.EndThread();
