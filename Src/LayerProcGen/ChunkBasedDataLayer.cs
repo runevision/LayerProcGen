@@ -239,7 +239,7 @@ namespace Runevision.LayerProcGen {
 				return;
 
 			// Load inside bounds.
-			GridBounds indices = bounds.GetDivided(new Point(chunkW, chunkH));
+			GridBounds indices = bounds.GetDivided(chunkSize);
 			List<Point> createIndices = new List<Point>();
 			List<Point> dependIndices = new List<Point>();
 			for (int x = indices.min.x; x < indices.max.x; x++) {
@@ -263,7 +263,7 @@ namespace Runevision.LayerProcGen {
 			}
 
 			Point center = bounds.center;
-			createIndices = createIndices.OrderBy(i => Math.Pow(i.x * chunkW - center.x, 2) + Math.Pow(i.y * chunkH - center.y, 2)).ToList();
+			createIndices = createIndices.OrderBy(i => (i * chunkSize - center).sqrMagnitude).ToList();
 
 			if (!LayerManager.instance.useParallelThreads) {
 				foreach (Point index in createIndices) {
