@@ -1,6 +1,14 @@
 # Changelog
 
 
+## 0.3.0 - 2024-12-07
+
+### Fixed
+
+- Fixed bug that chunk level parameter passed to ChunkBasedDataLayer.IsLoadedAtPosition was not being used.
+- Fixed regression bug introduced in 0.2.0 which caused the GenerationSource component to not start generating until moved, if initially at position (0,0).
+
+
 ## 0.2.0 - 2024-07-08
 
 ### Added

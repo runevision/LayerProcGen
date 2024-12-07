@@ -1,6 +1,6 @@
 {
   "name": "com.runevision.layerprocgen",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "displayName": "LayerProcGen",
   "description": "LayerProcGen is a framework that can be used to implement layer-based procedural generation that's infinite, deterministic and contextual.",
   "license": "MPL-2.0",

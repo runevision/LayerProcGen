@@ -132,23 +132,19 @@ namespace Runevision.LayerProcGen {
 		/// <param name="index">An integer coordinate that indexes into the grid of chunks.</param>
 		/// <param name="chunk">The requested chunk, or null.</param>
 		/// <returns>True if the chunk exists and has been generated to at least level 0.</returns>
-		protected bool TryGetChunk(Point index, out C chunk) {
+		protected bool TryGetChunk(Point index, out C chunk, int level = 0) {
 			chunk = chunks[index];
-			return (chunk != null && chunk.level >= 0);
+			return (chunk != null && chunk.level >= level);
 		}
 
-		void CreateAndRegisterChunk(Point index, int level) {
+		void CreateAndRegisterChunk(C chunk, int level) {
 			ChunkLevelData levelData = ObjectPool<ChunkLevelData>.GlobalGet();
-			EnsureChunkProviders(index, level, levelData);
+			EnsureChunkProviders(chunk.index, level, levelData);
 
 			if (LayerManager.instance.aborting)
 				return;
 
 			var ph = SimpleProfiler.Begin($"{GetType().Name} {level} Chunk");
-			C chunk = chunks[index];
-			if (chunk == null) {
-				Logg.LogError("Chunk is null in CreateAndRegisterChunk");
-			}
 
 			if (chunk.level < level) {
 				if (chunk.level != level - 1)
@@ -164,8 +160,7 @@ namespace Runevision.LayerProcGen {
 		}
 
 		internal sealed override void RemoveChunkLevel(Point index, int level) {
-			C chunk = chunks[index];
-			if (chunk != null) {
+			if (chunks[index] is C chunk) {
 				if (level == 0) {
 					lock (chunks) {
 						foreach (StateObject state in chunk.states)
@@ -244,7 +239,7 @@ namespace Runevision.LayerProcGen {
 
 			// Load inside bounds.
 			GridBounds indices = bounds.GetDivided(new Point(chunkW, chunkH));
-			List<Point> createIndices = new List<Point>();
+			List<C> createChunks = new List<C>();
 			List<Point> dependIndices = new List<Point>();
 			for (int x = indices.min.x; x < indices.max.x; x++) {
 				for (int y = indices.min.y; y < indices.max.y; y++) {
@@ -260,30 +255,30 @@ namespace Runevision.LayerProcGen {
 						}
 					}
 					if (chunk.level < level) {
-						createIndices.Add(index);
+						createChunks.Add(chunk);
 						WorkTracker.AddWorkNeeded(1, GetType());
 					}
 				}
 			}
 
 			Point center = bounds.center;
-			createIndices = createIndices.OrderBy(i => Math.Pow(i.x * chunkW - center.x, 2) + Math.Pow(i.y * chunkH - center.y, 2)).ToList();
+			createChunks = createChunks.OrderBy(chunk => (chunk.index * chunkSize - center).sqrMagnitude).ToList();
 
 			if (!LayerManager.instance.useParallelThreads) {
-				foreach (Point index in createIndices) {
-					CreateAndRegisterChunk(index, level);
+				foreach (C chunk in createChunks) {
+					CreateAndRegisterChunk(chunk, level);
 					WorkTracker.AddWorkDone(1, GetType());
 				}
 			}
 			else {
-				Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(createIndices),
-					index => {
+				Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(createChunks),
+					chunk => {
 						if (LayerManager.instance.aborting)
 							return;
-						SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {index}");
-						lock (chunks[index].levelLocks[level]) {
-							if (chunks[index].level < level)
-								CreateAndRegisterChunk(index, level);
+						SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {chunk.index}");
+						lock (chunk.levelLocks[level]) {
+							if (chunk.level < level)
+								CreateAndRegisterChunk(chunk, level);
 							WorkTracker.AddWorkDone(1, GetType());
 						}
 						SimpleProfiler.EndThread();
@@ -384,8 +379,7 @@ namespace Runevision.LayerProcGen {
 			lock (chunks) {
 				for (int x = minChunkIndex.x; x < maxChunkIndex.x; x++) {
 					for (int y = minChunkIndex.y; y < maxChunkIndex.y; y++) {
-						C chunk = chunks[x, y];
-						if (chunk != null && chunk.level >= minChunkLevel)
+						if (chunks[x, y] is C chunk && chunk.level >= minChunkLevel)
 							func(chunk);
 						else
 							missingAnyChunks = true;
@@ -461,8 +455,7 @@ namespace Runevision.LayerProcGen {
 						int gridYMax = Math.Min(gridBounds.max.y - chunkGridSize.y * j, chunkGridSize.y);
 
 						Point chunkOrigin = new Point(i * chunkGridSize.x, j * chunkGridSize.y);
-						C chunk = chunks[i, j];
-						if (chunk != null && chunk.level >= 0) {
+						if (chunks[i, j] is C chunk && chunk.level >= 0) {
 							// Iterate over grid points in chunk.
 							for (int x = gridXMin; x < gridXMax; x++) {
 								for (int y = gridYMin; y < gridYMax; y++) {
@@ -507,7 +500,7 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		public bool IsLoadedAtPosition(DPoint position, int level) {
 			var chunkIndex = new Point(Crd.Div((int)position.x, chunkW), Crd.Div((int)position.y, chunkH));
-			return TryGetChunk(chunkIndex, out C _);
+			return TryGetChunk(chunkIndex, out C _, level);
 		}
 	}
 
