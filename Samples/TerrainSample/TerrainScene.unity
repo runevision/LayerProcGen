@@ -217,19 +217,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 243
+      value: 58.578274
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 50
+      value: 3.944568
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 123
+      value: -51.63641
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9702957
+      value: 0.7501172
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalRotation.x
@@ -237,7 +237,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.24192187
+      value: -0.661305
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
       propertyPath: m_LocalRotation.z
@@ -397,6 +397,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   debugOverlay: {fileID: 172640912}
+  debugToggle: {fileID: 3081495784501062416, guid: 329647f4d1b71443fbfc4b9d06eb73c0,
+    type: 3}
+  screenshot: {fileID: 5952409894238647538, guid: 329647f4d1b71443fbfc4b9d06eb73c0,
+    type: 3}
 --- !u!1 &1306026625
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,7 +16,7 @@ public struct QueuedTerrainCallback<L, C> : IQueuedAction
 	public float[,,] splatmap;
 	public int[,] detailMap;
 	public TreeInstance[] treeInstances;
-	public Vector3 position;
+	public Vector3 posInChunk;
 	public TransformWrapper chunkParent;
 	public L layer;
 	public Point index;
@@ -27,7 +27,7 @@ public struct QueuedTerrainCallback<L, C> : IQueuedAction
 		int[,] detailMap,
 		TreeInstance[] treeInstances,
 		TransformWrapper chunkParent,
-		Vector3 position,
+		Vector3 posInChunk,
 		L layer,
 		Point index
 	) {
@@ -36,7 +36,7 @@ public struct QueuedTerrainCallback<L, C> : IQueuedAction
 		this.detailMap = detailMap;
 		this.treeInstances = treeInstances;
 		this.chunkParent = chunkParent;
-		this.position = position;
+		this.posInChunk = posInChunk;
 		this.layer = layer;
 		this.index = index;
 	}
@@ -173,7 +173,7 @@ public struct QueuedTerrainCallback<L, C> : IQueuedAction
 		Profiler.EndSample();
 
 		chunkParent.AddChild(terrain.transform);
-		terrain.transform.position = position;
+		terrain.transform.localPosition = posInChunk;
 
 		Profiler.BeginSample("Flush");
 		terrain.Flush();
@@ -203,7 +203,7 @@ public struct QueuedTerrainRecycleCallback<L, C> : IQueuedAction
 		terrain.transform.parent = null;
 		terrain.gameObject.SetActive(false);
 		layer.unusedTerrains.Add(terrain);
-		Object.Destroy(chunkParent.transform.gameObject);
+		chunkParent.Destroy();
 		TerrainLODManager.instance.UnregisterChunk(layer.lodLevel, index);
 	}
 }
@@ -217,10 +217,10 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 
 	NativeArray<float> heightsNA;
 	NativeArray<float3> distsNA;
-	NativeArray<float4> splatsNA;
+	NativeArray<Splat> splatsNA;
 	public PointerArray2D<float> heights;
 	public PointerArray2D<float3> dists;
-	public PointerArray2D<float4> splats;
+	public PointerArray2D<Splat> splats;
 	float[,] heightsArray;
 	float[,,] splatsArray;
 	int[,] detailMap;
@@ -228,14 +228,13 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 	public LandscapeChunk() {
 		heights = new PointerArray2D<float>(layer.gridResolution + 1, layer.gridResolution + 1, out heightsNA);
 		dists = new PointerArray2D<float3>(layer.gridResolution + 1, layer.gridResolution + 1, out distsNA);
-		splats = new PointerArray2D<float4>(layer.gridResolution + 1, layer.gridResolution + 1, out splatsNA);
+		splats = new PointerArray2D<Splat>(layer.gridResolution + 1, layer.gridResolution + 1, out splatsNA);
 		heightsArray = new float[layer.gridResolution + 1, layer.gridResolution + 1];
 		splatsArray = new float[layer.gridResolution + 1, layer.gridResolution + 1, 3];
 		detailMap = new int[layer.gridResolution, layer.gridResolution];
-		LayerManager.instance.abort += Dispose;
 	}
 
-	public void Dispose() {
+	protected override void Dispose() {
 		if (heightsNA.IsCreated)
 			heightsNA.Dispose();
 		if (distsNA.IsCreated)
@@ -261,15 +260,15 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 			}
 		}
 		else {
-			chunkParent = new TransformWrapper(layer.layerParent, index);
+			chunkParent = new TransformWrapper(layer.layerParent, index, worldOffset.xoy);
 			Build();
 		}
 	}
 
 	const int GridOffset = 4;
 
-	static ListPool<LocationSpec> locationSpecListPool = new ListPool<LocationSpec>(128);
-	static ListPool<PathSpec> pathSpecListPool = new ListPool<PathSpec>(128);
+	static ListPool<TerrainPath> locationSpecListPool = new ListPool<TerrainPath>(128);
+	static ListPool<TerrainPath> pathSpecListPool = new ListPool<TerrainPath>(128);
 
 	void Build() {
 		SimpleProfiler.ProfilerHandle ph;
@@ -285,15 +284,15 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 		if (layer.lodLevel < 3) {
 			// Apply deformation from locations.
 			ph = SimpleProfiler.Begin(phc, "Deform-Locations");
-			List<LocationSpec> locationSpecs = locationSpecListPool.Get();
+			List<TerrainPath> locationSpecs = locationSpecListPool.Get();
 			LocationLayer.instance.GetLocationSpecsOverlappingBounds(this, locationSpecs, bounds);
-			TerrainDeformation.ApplySpecs(
+			TerrainPathDeformation.ApplyPaths(
 				heightsNA, distsNA, splatsNA,
 				index * layer.chunkResolution - Point.one * GridOffset,
 				Point.one * (layer.gridResolution + 1),
-				((float2)layer.chunkSize) / layer.chunkResolution,
+				((DFloat)layer.chunkSize.x) / layer.chunkResolution,
 				locationSpecs,
-				(SpecPoint p) => {
+				(PathPoint p) => {
 					p.centerElevation = 0;
 					return p;
 				});
@@ -303,13 +302,13 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 			if (layer.lodLevel < 2) {
 				// Apply deformation from paths.
 				ph = SimpleProfiler.Begin(phc, "Deform-Paths");
-				List<PathSpec> pathSpecs = pathSpecListPool.Get();
+				List<TerrainPath> pathSpecs = pathSpecListPool.Get();
 				CultivationLayer.instance.GetPathsOverlappingBounds(this, pathSpecs, bounds);
-				TerrainDeformation.ApplySpecs(
+				TerrainPathDeformation.ApplyPaths(
 					heightsNA, distsNA, splatsNA,
 					index * layer.chunkResolution - Point.one * GridOffset,
 					Point.one * (layer.gridResolution + 1),
-					((float2)layer.chunkSize) / layer.chunkResolution,
+					((DFloat)layer.chunkSize.x) / layer.chunkResolution,
 					pathSpecs);
 				pathSpecListPool.Return(ref pathSpecs);
 				SimpleProfiler.End(ph);
@@ -317,13 +316,10 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 		}
 
 		RandomHash rand = new RandomHash(123);
-		RandomHash rand2 = new RandomHash(234);
 
 		ph = SimpleProfiler.Begin(phc, "Splat Noise (GetNormal)");
 		HandleSplats(terrainOrigin, cellSize, layer.gridResolution, ref heights, ref splats);
 		SimpleProfiler.End(ph);
-
-		
 
 		ph = SimpleProfiler.Begin(phc, "Handle Edges");
 		float lowering = 1 << layer.lodLevel;
@@ -366,7 +362,7 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 		float posOffset = -GridOffset * layer.chunkW / layer.chunkResolution;
 		QueuedTerrainCallback<L, C> action = new QueuedTerrainCallback<L, C>(
 			heightsArray, splatsArray, detailMap, null, chunkParent,
-			new Vector3(index.x * layer.chunkW + posOffset, height, index.y * layer.chunkH + posOffset),
+			new Vector3(posOffset, height, posOffset),
 			layer, index
 		);
 		MainThreadActionQueue.Enqueue(action);
@@ -389,24 +385,24 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 	[BurstCompile]
 	static void HandleSplats(
 		in DPoint terrainOrigin, in DPoint cellSize, int gridResolution,
-		ref PointerArray2D<float> heights, ref PointerArray2D<float4> splats
+		ref PointerArray2D<float> heights, ref PointerArray2D<Splat> splats
 	) {
 		// Skip edges in iteration - we need those for calculating normal only.
 		float doubleCellSize = 2f * (float)cellSize.x;
 		for (var zRes = 1; zRes <= gridResolution - 1; zRes++) {
 			for (var xRes = 1; xRes <= gridResolution - 1; xRes++) {
-				float4 current = splats[zRes, xRes];
+				Splat current = splats[zRes, xRes];
 				GetNormal(xRes, zRes, doubleCellSize, heights, out float3 normal);
 
 				// Handle grass vs cliff based on steepness.
 				float cliff = normal.y < 0.65f ? 1f : 0f;
-				float4 terrainSplat = new float4(1f - cliff, cliff, 0f, 0f);
+				Splat terrainSplat = new Splat(1f - cliff, cliff, 0f, 0f);
 
 				// Reduce path splat where there's cliff splat.
-				current.z = Mathf.Min(current.z, 1f - cliff);
+				current.c = Mathf.Min(current.c, 1f - cliff);
 
 				// Apply terrain splats (grass/cliff) with remaining unused weight.
-				float usedWeight = current.x + current.y + current.z + current.w;
+				float usedWeight = current.a + current.b + current.c + current.d;
 				current += terrainSplat * (1f - usedWeight);
 
 				splats[zRes, xRes] = current;
@@ -450,14 +446,14 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 	[BurstCompile]
 	static void CopySplats(
 		int resolution,
-		in PointerArray2D<float4> splats,
+		in PointerArray2D<Splat> splats,
 		ref PointerArray3D<float> splatsArray
 	) {
 		for (var zRes = 0; zRes < resolution + 1; zRes++) {
 			for (var xRes = 0; xRes < resolution + 1; xRes++) {
-				splatsArray[zRes, xRes, 0] = splats[zRes, xRes].x;
-				splatsArray[zRes, xRes, 1] = splats[zRes, xRes].y;
-				splatsArray[zRes, xRes, 2] = splats[zRes, xRes].z;
+				splatsArray[zRes, xRes, 0] = splats[zRes, xRes].a;
+				splatsArray[zRes, xRes, 1] = splats[zRes, xRes].b;
+				splatsArray[zRes, xRes, 2] = splats[zRes, xRes].c;
 			}
 		}
 	}
@@ -465,17 +461,17 @@ public abstract class LandscapeChunk<L, C> : LayerChunk<L, C>
 	[BurstCompile]
 	static void GenerateDetails(
 		int resolution, in RandomHash rand,
-		in PointerArray2D<float4> splats,
+		in PointerArray2D<Splat> splats,
 		ref PointerArray2D<int> detailMap
 	) {
 		for (int x = GridOffset; x < resolution - GridOffset; x++) {
 			for (int z = GridOffset; z < resolution - GridOffset; z++) {
-				float4 splatsAvg = 0.25f * (splats[z, x] + splats[z + 1, x] + splats[z, x + 1] + splats[z + 1, x + 1]);
-				float grassSplatAvg = splatsAvg.x;
+				Splat splatsAvg = 0.25f * (splats[z, x] + splats[z + 1, x] + splats[z, x + 1] + splats[z + 1, x + 1]);
+				float grassSplatAvg = splatsAvg.a;
 				if (grassSplatAvg > 0.4f) {
 					float grassSplatMax = math.max(
-						math.max(splats[z, x    ].x, splats[z + 1, x    ].x),
-						math.max(splats[z, x + 1].x, splats[z + 1, x + 1].x)
+						math.max(splats[z, x    ].a, splats[z + 1, x    ].a),
+						math.max(splats[z, x + 1].a, splats[z + 1, x + 1].a)
 					);
 					float grassDetailVal = grassSplatMax * 10f + rand.Range(-0.5f, 0.5f, x, z, 9);
 					detailMap[z, x] = Mathf.RoundToInt(grassDetailVal);

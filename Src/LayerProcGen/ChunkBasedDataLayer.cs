@@ -10,7 +10,6 @@ using Runevision.Common;
 using Runevision.SaveState;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Runevision.LayerProcGen {
@@ -36,7 +35,7 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		bool IsLoadedAtPosition(DPoint position, int level);
 	}
-	
+
 	/// <summary>
 	/// Internal. Non-generic class that ChunkBasedDataLayer inherits from.
 	/// </summary>
@@ -87,6 +86,8 @@ namespace Runevision.LayerProcGen {
 
 		protected readonly List<LayerDependency>[] dependencies;
 
+		readonly Action<ChunkCreationData> chunkWork;
+
 		/// <summary>
 		/// Call from constructor to add a dependency on another layer.
 		/// The dependency is added to the lowest level of the current layer.
@@ -102,16 +103,16 @@ namespace Runevision.LayerProcGen {
 		protected void AddLayerDependency(int ownLevel, LayerDependency dependency) {
 			dependencies[ownLevel].Add(dependency);
 		}
-		
+
 		/// <summary>
 		/// The layer constructor in inherited classes can be used to setup dependencies on other layers.
 		/// </summary>
-		/// <param name="rollingGridWidth">The width of the rolling grid 
+		/// <param name="rollingGridWidth">The width of the rolling grid
 		/// the chunks are stored in. The default is 32.</param>
-		/// <param name="rollingGridHeight">The height of the rolling grid 
+		/// <param name="rollingGridHeight">The height of the rolling grid
 		/// the chunks are stored in. If set to 0, the value of rollingGridWidth is used.
 		/// The default is 0.</param>
-		/// <param name="rollingGridMaxOverlap">The max overlap of the rolling grid 
+		/// <param name="rollingGridMaxOverlap">The max overlap of the rolling grid
 		/// the chunks are stored in. The default is 3.</param>
 		protected ChunkBasedDataLayer(
 			int rollingGridWidth = 32, int rollingGridHeight = 0, int rollingGridMaxOverlap = 3
@@ -124,6 +125,8 @@ namespace Runevision.LayerProcGen {
 			dependencies = new List<LayerDependency>[levelCount];
 			for (int i = 0; i < levelCount; i++)
 				dependencies[i] = new List<LayerDependency>();
+
+			chunkWork = ChunkWork;
 		}
 
 		/// <summary>
@@ -233,17 +236,44 @@ namespace Runevision.LayerProcGen {
 			}
 		}
 
+		struct ChunkCreationData : IComparable<ChunkCreationData> {
+			public C chunk;
+			public int level;
+			public int dist;
+			public int CompareTo(ChunkCreationData other) => dist - other.dist;
+		}
+
+		void ChunkWork(ChunkCreationData chunkCreationData) {
+			if (LayerManager.instance.aborting)
+				return;
+			C chunk = chunkCreationData.chunk;
+			int level = chunkCreationData.level;
+			SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {chunk.index}");
+			lock (chunk.levelLocks[level]) {
+				if (chunk.level < level)
+					CreateAndRegisterChunk(chunk, level);
+				WorkTracker.AddWorkDone(1, GetType());
+			}
+			SimpleProfiler.EndThread();
+		}
+
+		static ListPool<ChunkCreationData> createChunksListPool = new ListPool<ChunkCreationData>(128);
+		static ListPool<Point> dependIndicesListPool = new ListPool<Point>(128);
+
 		internal sealed override void EnsureLoadedInBounds(GridBounds bounds, int level, ChunkLevelData levelData) {
 			if (LayerManager.instance.aborting)
 				return;
 
 			// Load inside bounds.
 			GridBounds indices = bounds.GetDivided(new Point(chunkW, chunkH));
-			List<C> createChunks = new List<C>();
-			List<Point> dependIndices = new List<Point>();
+			List<ChunkCreationData> createChunks = createChunksListPool.Get();
+			List<Point> dependIndices = dependIndicesListPool.Get();
+			Point center = bounds.center;
 			for (int x = indices.min.x; x < indices.max.x; x++) {
 				for (int y = indices.min.y; y < indices.max.y; y++) {
 					Point index = new Point(x, y);
+					Point compDists = new Point(x * chunkW - center.x, y * chunkH - center.y);
+					int dist = compDists.x * compDists.x + compDists.y * compDists.y;
 					dependIndices.Add(index);
 					C chunk;
 					lock (chunks) {
@@ -255,34 +285,25 @@ namespace Runevision.LayerProcGen {
 						}
 					}
 					if (chunk.level < level) {
-						createChunks.Add(chunk);
+						ChunkCreationData chunkData =
+							new ChunkCreationData { chunk = chunk, level = level, dist = dist };
+						createChunks.Add(chunkData);
 						WorkTracker.AddWorkNeeded(1, GetType());
 					}
 				}
 			}
-
-			Point center = bounds.center;
-			createChunks = createChunks.OrderBy(chunk => (chunk.index * chunkSize - center).sqrMagnitude).ToList();
+			createChunks.Sort();
 
 			if (!LayerManager.instance.useParallelThreads) {
-				foreach (C chunk in createChunks) {
-					CreateAndRegisterChunk(chunk, level);
+				foreach (ChunkCreationData chunkData in createChunks) {
+					CreateAndRegisterChunk(chunkData.chunk, level);
 					WorkTracker.AddWorkDone(1, GetType());
 				}
 			}
 			else {
-				Parallel.ForEach(System.Collections.Concurrent.Partitioner.Create(createChunks),
-					chunk => {
-						if (LayerManager.instance.aborting)
-							return;
-						SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {chunk.index}");
-						lock (chunk.levelLocks[level]) {
-							if (chunk.level < level)
-								CreateAndRegisterChunk(chunk, level);
-							WorkTracker.AddWorkDone(1, GetType());
-						}
-						SimpleProfiler.EndThread();
-					});
+				Parallel.ForEach(
+					System.Collections.Concurrent.Partitioner.Create(createChunks),
+					chunkWork);
 			}
 
 			if (LayerManager.instance.aborting)
@@ -293,6 +314,9 @@ namespace Runevision.LayerProcGen {
 				chunk.IncrementUserCountOfLevel(level);
 				levelData.providers.Add(new ChunkLevelData.ProviderStruct(chunk, level));
 			}
+
+			createChunksListPool.Return(ref createChunks);
+			dependIndicesListPool.Return(ref dependIndices);
 		}
 
 		/// <summary>

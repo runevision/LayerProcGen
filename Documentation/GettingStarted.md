@@ -2,13 +2,47 @@
 
 Follow this guide to quickly get simple procedural generation of chunks up and running in Unity.
 
-## Create layer and chunk classes
+## Installation in Unity
 
-First we need to create a layer-and-chunk pair of classes.
+LayerProcGen requires Unity 2019.4 or later.
+
+Install LayerProcGen as a Unity Package Manager package from this Git URL:
+
+`https://github.com/runevision/LayerProcGen.git#upm`
+
+See [Unity's instructions here](https://docs.unity3d.com/Manual/upm-ui-giturl.html). If you already have Git installed, it's simply these steps:
+
+- Open the Package Manager window via `Window > Package Manager`
+- Click the `+` button and choose `Add package from git URL...`
+- Paste the URL: `https://github.com/runevision/LayerProcGen.git#upm`
+- Click `Add`
+
+### Importing samples
+
+You can also import samples for how to use the framework on the `Samples` tab of the package.
+
+The *Simple Samples* have no special requirements.
+
+The *Terrain Sample* requires:
+
+- Packages:
+   - Burst package
+   - Input System package
+- Player Settings:
+   - Enabling `Allow unsafe code`
+   - Setting `Active Input Handling` to either `Input System Package (New)` or `Both`
+   - Setting `Color Space` to `Linear` (recommended)
+- Only tested with Builtin Render Pipeline
+
+## Your first test
+
+Here's how to create your own layer-and-chunk pair of classes and get them running in a simple scene.
+
+### Create layer and chunk classes
 
 Below is a minimal example that creates three random points within each chunk, and where the layer has an API for retrieving all points within given bounds.
 
-You can save this example code as a file named `PointsLayer.cs`:
+You can save this example code as a file named `PointsLayer.cs` (also included in the Simple Samples):
 
 ```cs
 using Runevision.Common;
@@ -80,7 +114,7 @@ public class PointsLayer : ChunkBasedDataLayer<PointsLayer, PointsChunk> {
 }
 ```
 
-## Add components that set things in motion
+### Add components that set things in motion
 
 Next, the framework needs two things to be set in motion: The LayerManager and a TopLayerDependecy.
 
@@ -90,7 +124,7 @@ Next, the framework needs two things to be set in motion: The LayerManager and a
 	* In the `Layer` dropdown, select your `PointsLayer`.
 	* Set the `Size` property to 2000, 2000.
 
-## Test the generation
+### Test the generation
 
 Now you're ready to test the generation!
 

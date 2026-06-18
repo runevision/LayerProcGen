@@ -17,7 +17,7 @@ namespace Runevision.Common {
 	public partial struct Point3 {
 
 		// User-defined conversion from Point to Vector3
-		public static implicit operator Vector3(Point3 p) {
+		public static explicit operator Vector3(Point3 p) {
 			return new Vector3(p.x, p.y, p.z);
 		}
 
@@ -28,7 +28,7 @@ namespace Runevision.Common {
 
 #if PACKAGE_UNITY_MATHEMATICS
 		// User-defined conversion from Point to float3
-		public static implicit operator float3(Point3 p) {
+		public static explicit operator float3(Point3 p) {
 			return new float3(p.x, p.y, p.z);
 		}
 

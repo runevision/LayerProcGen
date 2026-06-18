@@ -38,7 +38,7 @@ public class LocationChunk : LayerChunk<LocationLayer, LocationChunk> {
 
 	Point[] initPositions;
 	List<Location> locations;
-	List<LocationSpec> locationSpecs = new List<LocationSpec>();
+	List<TerrainPath> locationSpecs = new List<TerrainPath>();
 	List<Connection> connections = new List<Connection>();
 	Color chunkColor;
 
@@ -76,7 +76,7 @@ public class LocationChunk : LayerChunk<LocationLayer, LocationChunk> {
 		if (level == 1) {
 			if (destroy) {
 				ObjectPool<Location>.GlobalReturnAll(locations);
-				ObjectPool<LocationSpec>.GlobalReturnAll(locationSpecs);
+				ObjectPool<TerrainPath>.GlobalReturnAll(locationSpecs);
 			}
 			else {
 				// Adjust positions to be more evenly distributed.
@@ -91,7 +91,7 @@ public class LocationChunk : LayerChunk<LocationLayer, LocationChunk> {
 					// Store result in Location further down, don't overwrite any data.
 					Vector2 vect = Vector2.zero;
 					for (int j = 0; j < allPositions.Count; j++) {
-						Vector2 dif = allPositions[j] - initPositions[i];
+						Vector2 dif = (Vector2)(allPositions[j] - initPositions[i]);
 						if (dif == Vector2.zero)
 							continue;
 						float dist = dif.magnitude;
@@ -113,8 +113,8 @@ public class LocationChunk : LayerChunk<LocationLayer, LocationChunk> {
 
 					// Create location specification from the location.
 					DPoint3 specPos = location.posWithHeight + DPoint3.up * 2;
-					LocationSpec locationSpec = ObjectPool<LocationSpec>.GlobalGet()
-						.Init((Vector3)specPos, 0, location.radius * 2, 20f, location.radius * 2 - 2, 0f);
+					TerrainPath locationSpec = ObjectPool<TerrainPath>.GlobalGet()
+						.InitPoint(specPos, 0, location.radius * 2, 20f, location.radius * 2 - 2, 0f);
 					locationSpec.CalculateBounds();
 					locationSpecs.Add(locationSpec);
 				}
@@ -160,7 +160,7 @@ public class LocationChunk : LayerChunk<LocationLayer, LocationChunk> {
 		}
 	}
 
-	public void GetLocationSpecsOverlappingBounds(List<LocationSpec> outSpecs, GridBounds bounds) {
+	public void GetLocationSpecsOverlappingBounds(List<TerrainPath> outSpecs, GridBounds bounds) {
 		foreach (var spec in locationSpecs) {
 			if (!bounds.Overlaps(spec.bounds))
 				continue;
@@ -323,7 +323,7 @@ public class LocationLayer : ChunkBasedDataLayer<LocationLayer, LocationChunk>, 
 		});
 	}
 
-	public void GetLocationSpecsOverlappingBounds(ILC q, List<LocationSpec> outSpecs, GridBounds bounds) {
+	public void GetLocationSpecsOverlappingBounds(ILC q, List<TerrainPath> outSpecs, GridBounds bounds) {
 		// Expanded bounds required since locations are not necessarily inside the bounds
 		// of the chunk they're generated and stored in.
 		HandleChunksInBounds(q, bounds.GetExpanded(requiredPadding), 1, chunk => {

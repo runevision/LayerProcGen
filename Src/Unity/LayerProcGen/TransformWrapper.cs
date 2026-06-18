@@ -14,20 +14,23 @@ namespace Runevision.LayerProcGen {
 	/// <summary>
 	/// Transform stand-in that chunks can create outside of the main thread.
 	/// </summary>
-	public class TransformWrapper {
+	public class TransformWrapper : IOriginHandler {
 
 		public Transform transform { get; private set; }
 
 		Transform layerParent;
 		Point chunkIndex;
+		Point3 worldPosition;
 
-		public TransformWrapper(Transform layerParent, Point chunkIndex) {
+		public TransformWrapper(Transform layerParent, Point chunkIndex, Point3 worldPosition = default) {
 			this.layerParent = layerParent;
 			this.chunkIndex = chunkIndex;
+			this.worldPosition = worldPosition;
 		}
 
 		/// <summary>
 		/// Creates the wrapper's own Transform if it doesn't exist, then adds the child.
+		/// The child's position is interpreted as a local position relative to the wrapper's.
 		/// </summary>
 		public void AddChild(Transform child, bool matchParentLayer = false) {
 			// Ignore if layerParent is null. This can sometimes happen while unloading a scene.
@@ -36,11 +39,28 @@ namespace Runevision.LayerProcGen {
 			if (transform == null) {
 				transform = new GameObject("Chunk" + chunkIndex).transform;
 				transform.SetParent(layerParent, false);
+				transform.position = (Vector3)(worldPosition - FloatingOrigin.origin);
 				transform.gameObject.layer = layerParent.gameObject.layer;
+				FloatingOrigin.RegisterHandler(this);
 			}
 			child.SetParent(transform, false);
 			if (matchParentLayer)
 				child.gameObject.layer = transform.gameObject.layer;
+		}
+
+		/// <summary>
+		/// Destroys the Transform and unregisters the wrapper.
+		/// Must be called from the main thread.
+		/// </summary>
+		public void Destroy() {
+			if (transform != null)
+				transform.gameObject.Destroy();
+			FloatingOrigin.UnregisterHandler(this);
+		}
+
+		public void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin) {
+			if (transform != null)
+				transform.position = (Vector3)(worldPosition - newOrigin);
 		}
 	}
 

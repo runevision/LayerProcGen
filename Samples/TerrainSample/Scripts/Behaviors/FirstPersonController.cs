@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class FirstPersonController : MonoBehaviour {
+public class FirstPersonController : MonoBehaviour, IOriginHandler {
 
 	public InputActionReference move;
 	public InputActionReference look;
@@ -44,6 +44,8 @@ public class FirstPersonController : MonoBehaviour {
 		look.action.Enable();
 		jump.action.Enable();
 		runToggle.action.Enable();
+		
+		FloatingOrigin.RegisterHandler(this);
 	}
 
 	void OnDisable() {
@@ -51,6 +53,18 @@ public class FirstPersonController : MonoBehaviour {
 		look.action.Disable();
 		jump.action.Disable();
 		runToggle.action.Disable();
+		
+		FloatingOrigin.UnregisterHandler(this);
+	}
+	
+	public void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin) {
+		if (newOrigin == oldOrigin)
+			return;
+		Vector3 delta = (Vector3)(newOrigin - oldOrigin);
+		bool wasEnabled = m_CharacterController.enabled;
+		m_CharacterController.enabled = false;
+		transform.position -= delta;
+		m_CharacterController.enabled = wasEnabled;
 	}
 
 	void Update() {

@@ -19,9 +19,12 @@ namespace Runevision.Common {
 			}
 
 			if (t.IsGenericType) {
+				int apostropheIndex = t.Name.LastIndexOf("`", StringComparison.InvariantCulture);
+				if (apostropheIndex < 0)
+					apostropheIndex = t.Name.Length;
 				return string.Format(
 					"{0}<{1}>",
-					t.Name.Substring(0, t.Name.LastIndexOf("`", StringComparison.InvariantCulture)),
+					t.Name.Substring(0, apostropheIndex),
 					string.Join(", ", t.GetGenericArguments().Select(PrettyName)));
 			}
 

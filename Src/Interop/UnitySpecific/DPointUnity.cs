@@ -37,6 +37,8 @@ namespace Runevision.Common {
 		}
 
 #if PACKAGE_UNITY_MATHEMATICS
+		public int2 value => new int2(x.value, y.value);
+
 		// User-defined conversion from DPoint to float3
 		public static explicit operator float3(DPoint p) {
 			return new float3((float)p.x, (float)p.y, 0);
@@ -54,6 +56,16 @@ namespace Runevision.Common {
 
 		//  User-defined conversion from float2 to DPoint
 		public static implicit operator DPoint(float2 p) {
+			return new DPoint(p.x, p.y);
+		}
+
+		// User-defined conversion from DPoint to int2
+		public static explicit operator int2(DPoint p) {
+			return new int2((int)p.x, (int)p.y);
+		}
+
+		//  User-defined conversion from int2 to DPoint
+		public static implicit operator DPoint(int2 p) {
 			return new DPoint(p.x, p.y);
 		}
 #endif

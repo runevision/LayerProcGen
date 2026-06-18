@@ -1,6 +1,45 @@
 # Changelog
 
 
+## 0.4.0 - 2026-06-18
+
+### Added
+
+- Added support for floating origin to support large worlds without suffering floating point precision issues.
+   - A floating origin entails a difference between the world origin and the current scene origin. The scene origin can be set via the FloatingOrigin class.
+   - Added IOriginHandler interface which classes can implement to handle origin shifting.
+   - Added a Unity FloatingOriginSetter component, which automatically updates the floating origin when the GameObject it's attached to has moved beyond an increment distance.
+   - Added support for specifying world positions for TransformWrapper, which now handle origin shifts automatically.
+   - Added DebugDrawer DPoint overloads interpreted as world positions.
+- Added virtual Dispose method to chunks which can be used for disposing native resources after all generation has been stopped.
+- Added support for enqueueing routines (IEnumerator) on the MainThreadActionQueue.
+- Added public DFloat resolution constants.
+- Added conversions between DPoint and int2 (Unity.Mathematics)
+- Added a debug toggle to disable SimpleProfiler logging, and a button to log pool stats.
+- Added DFloat overloads in RandomHash and Crd classes.
+- Added multiplication and division operations for DFloat (and DPoint, DPoint3) with itself.
+- Added DebugDrawer.DrawCircle overload that takes a rotation parameter.
+
+## Changed
+
+- Removed LayerManager abort Action. Chunks can instead override Dispose method to clean up and free resources.
+- Removed implicit conversions from fixed point to floating point coordinates, that is, between float and DFloat, Vector2 and DPoint, Vector3 and DPoint3. This helps prevent accidental reinterpretations between world coordinates and scene coordinates.
+- Allow calling SimpleProfiler.Begin without a handle as a no-op.
+- Set MainThreadActionQueue budget as float to allow sub-millisecond precision in budget.
+- DebugOptions are now listed alphabetically rather than in a non-deterministic order.
+- Throw exception in DEBUG if DFloat constructor causes integer overflow.
+
+### Fixed
+
+- Fixed race conditions in DebugOptions and TopDependency.
+- Avoided allocations from delegate closures in ChunkBasedDataLayer and VisualizationManager.
+- Avoided allocations from creating lists in ChunkBasedDataLayer.
+- Ensured MainThreadActionQueue.NextFrame queue is always executed next frame.
+- Fixed bug in PrettyName function for non-generic types nested in generic classes.
+- Fixed bug where subsequent specifications of the same DebugOption would reset it to its default value.
+- Fixed LayerManager.Unload such that subsequent calls are ignored once already aborting.
+
+
 ## 0.3.0 - 2024-12-07
 
 ### Fixed

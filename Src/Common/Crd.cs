@@ -71,12 +71,26 @@ namespace Runevision.Common {
 			return ((x % period) + period) % period;
 		}
 
+		public static DFloat Mod(DFloat x, DFloat period) {
+			return new DFloat() {
+				value = ((x.value % period.value) + period.value) % period.value
+			};
+		}
+
 		public static Point Mod(Point p, int period) {
 			return new Point(Mod(p.x, period), Mod(p.y, period));
 		}
 
 		public static Point Mod(Point p, Point period) {
 			return new Point(Mod(p.x, period.x), Mod(p.y, period.y));
+		}
+
+		public static DPoint Mod(DPoint p, DFloat period) {
+			return new DPoint(Mod(p.x, period), Mod(p.y, period));
+		}
+
+		public static DPoint Mod(DPoint p, DPoint period) {
+			return new DPoint(Mod(p.x, period.x), Mod(p.y, period.y));
 		}
 
 		// RoundToPeriod rounds towards the nearest multiple of period; up if half-way in between.
@@ -91,12 +105,27 @@ namespace Runevision.Common {
 			return x - (((x % period) + period) % period);
 		}
 
+		public static DFloat RoundToPeriod(DFloat x, DFloat period) {
+			x += period / 2;
+			return new DFloat() {
+				value = x.value - (((x.value % period.value) + period.value) % period.value)
+			};
+		}
+
 		public static Point RoundToPeriod(Point p, int period) {
 			return new Point (RoundToPeriod(p.x, period), RoundToPeriod(p.y, period));
 		}
 
 		public static Point RoundToPeriod(Point p, Point period) {
 			return new Point (RoundToPeriod(p.x, period.x), RoundToPeriod(p.y, period.y));
+		}
+
+		public static DPoint RoundToPeriod(DPoint p, DFloat period) {
+			return new DPoint (RoundToPeriod(p.x, period), RoundToPeriod(p.y, period));
+		}
+
+		public static DPoint RoundToPeriod(DPoint p, DPoint period) {
+			return new DPoint (RoundToPeriod(p.x, period.x), RoundToPeriod(p.y, period.y));
 		}
 	}
 

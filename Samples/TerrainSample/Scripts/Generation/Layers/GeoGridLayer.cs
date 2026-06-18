@@ -13,22 +13,21 @@ using UnityEngine;
 // instead (essentially caching them) so multiple CultivationLayer chunks can use
 // the same already calculated data.
 
-public class GeoGridChunk : LayerChunk<GeoGridLayer, GeoGridChunk>, IDisposable {
+public class GeoGridChunk : LayerChunk<GeoGridLayer, GeoGridChunk> {
 	NativeArray<float> heightsNA;
 	NativeArray<float3> distsNA;
-	NativeArray<float4> splatsNA;
+	NativeArray<Splat> splatsNA;
 	public PointerArray2D<float> heights;
 	public PointerArray2D<float3> dists;
-	public PointerArray2D<float4> splats;
+	public PointerArray2D<Splat> splats;
 
 	public GeoGridChunk() {
 		heights = new PointerArray2D<float>(layer.gridChunkRes.y, layer.gridChunkRes.x, out heightsNA);
 		dists = new PointerArray2D<float3>(layer.gridChunkRes.y, layer.gridChunkRes.x, out distsNA);
-		splats = new PointerArray2D<float4>(layer.gridChunkRes.y, layer.gridChunkRes.x, out splatsNA);
-		LayerManager.instance.abort += Dispose;
+		splats = new PointerArray2D<Splat>(layer.gridChunkRes.y, layer.gridChunkRes.x, out splatsNA);
 	}
 
-	public void Dispose() {
+	protected override void Dispose() {
 		if (heightsNA.IsCreated)
 			heightsNA.Dispose();
 		if (distsNA.IsCreated)
@@ -50,7 +49,7 @@ public class GeoGridChunk : LayerChunk<GeoGridLayer, GeoGridChunk>, IDisposable 
 		}
 	}
 
-	static ListPool<LocationSpec> locationSpecListPool = new ListPool<LocationSpec>(64);
+	static ListPool<TerrainPath> locationSpecListPool = new ListPool<TerrainPath>(64);
 
 	void Build() {
 		Point gridChunkRes = layer.gridChunkRes;
@@ -73,22 +72,22 @@ public class GeoGridChunk : LayerChunk<GeoGridLayer, GeoGridChunk>, IDisposable 
 
 		// Apply deformation from locations.
 		ph = SimpleProfiler.Begin(phc, "Deform-LocationDeformation");
-		List<LocationSpec> locationSpecs = locationSpecListPool.Get();
+		List<TerrainPath> locationSpecs = locationSpecListPool.Get();
 		LocationLayer.instance.GetLocationSpecsOverlappingBounds(this, locationSpecs, bounds);
-		TerrainDeformation.ApplySpecs(
+		TerrainPathDeformation.ApplyPaths(
 			heightsNA, distsNA, splatsNA,
 			gridOrigin,
 			gridChunkRes,
-			Point.one * TerrainPathFinder.halfCellSize,
+			TerrainPathFinder.halfCellSize,
 			locationSpecs,
-			(SpecPoint p) => {
+			(PathPoint p) => {
 				p.innerWidth += 2;
 				p.centerElevation = 0;
 				return p;
 			},
-			(SpecData d) => {
-				d.bounds = new float4(
-					d.bounds.x - 2, d.bounds.y - 2, d.bounds.z + 2, d.bounds.w + 2);
+			(PathData d) => {
+				d.boundsMin -= new DPoint(2, 2);
+				d.boundsMax += new DPoint(2, 2);
 				return d;
 			});
 		locationSpecListPool.Return(ref locationSpecs);
@@ -103,13 +102,17 @@ public class GeoGridLayer : ChunkBasedDataLayer<GeoGridLayer, GeoGridChunk> {
 	public Point gridChunkRes;
 
 	public GeoGridLayer() {
-		gridChunkRes = chunkSize / TerrainPathFinder.halfCellSize;
+		gridChunkRes = (chunkSize / TerrainPathFinder.cellSize) * 2;
+		#if UNITY_EDITOR
+		if (chunkSize.x / TerrainPathFinder.cellSize != ((float)chunkSize.x) / TerrainPathFinder.cellSize)
+			Logg.LogError("GeoGridLayer chunkSize is not multiple of TerrainPathFinder.cellSize");
+		#endif
 
 		AddLayerDependency(new LayerDependency(LocationLayer.instance, LocationLayer.requiredPadding, 1));
 	}
 
-	public void GetDataInBounds(ILC q, GridBounds bounds, float[,] heights, Vector3[,] dists, Vector4[,] splats) {
-		HandleGridPoints(q, bounds, chunkSize / TerrainPathFinder.halfCellSize,
+	public void GetDataInBounds(ILC q, GridBounds bounds, float[,] heights, Vector3[,] dists, Splat[,] splats) {
+		HandleGridPoints(q, bounds, gridChunkRes,
 			(GeoGridChunk chunk, Point localPointInChunk, Point globalPoint) => {
 				int x = globalPoint.x - bounds.min.x;
 				int z = globalPoint.y - bounds.min.y;

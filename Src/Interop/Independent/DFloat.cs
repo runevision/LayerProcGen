@@ -12,22 +12,34 @@ namespace Runevision.Common {
 
 	[Serializable]
 	public struct DFloat : IEquatable<DFloat> {
-		const int Res = 256;
-		const int HalfRes = 128;
-		const float DivFloat = 1f / Res;
-		const double DivDouble = 1d / Res;
+		public const int Res = 256;
+		public const int HalfRes = 128;
+		public const float DivFloat = 1f / Res;
+		public const double DivDouble = 1d / Res;
 
 		public int value;
 
 		public DFloat(int value) {
+			#if DEBUG
+			if (value > 8388607 || value < -8388607)
+				throw new OverflowException();
+			#endif
 			this.value = value * Res;
 		}
 
 		public DFloat(float value) {
+			#if DEBUG
+			if (value > 8388607 || value < -8388607)
+				throw new OverflowException();
+			#endif
 			this.value = (int)Math.Floor(value * Res);
 		}
 
 		public DFloat(double value) {
+			#if DEBUG
+			if (value > 8388607 || value < -8388607)
+				throw new OverflowException();
+			#endif
 			this.value = (int)Math.Floor(value * Res);
 		}
 
@@ -47,12 +59,21 @@ namespace Runevision.Common {
 			return new DFloat(f);
 		}
 
+		// Private use. Identical method in Crd class can't be used due to
+		// assembly definition dependency directions.
 		static int Div(int x, int divisor) {
 			return (x - (((x % divisor) + divisor) % divisor)) / divisor;
 		}
 
+		// Private use. Identical method in Crd class can't be used due to
+		// assembly definition dependency directions.
 		static int DivUp(int x, int divisor) {
 			return (x - (((x % divisor) - divisor) % divisor)) / divisor;
+		}
+
+		// Private use.
+		static long Div(long x, long divisor) {
+			return (x - (((x % divisor) + divisor) % divisor)) / divisor;
 		}
 
 		public static explicit operator int(DFloat f) {
@@ -111,8 +132,19 @@ namespace Runevision.Common {
 			return new DFloat { value = Div(a.value, f) };
 		}
 
-		// Don't support multiplying or dividing DFloat with float or other DFloat
-		// since it hits int max value too easily.
+		public static DPoint operator *(Point a, DFloat f) {
+			return new DPoint(f * a.x, f * a.y);
+		}
+
+		public static DFloat operator *(DFloat a, DFloat f) {
+			// Multiply with more bits, truncate afterwards.
+			return new DFloat { value = (int)((long)(a.value) * (long)(f.value) / Res) };
+		}
+
+		public static DFloat operator /(DFloat a, DFloat f) {
+			// Multiply with more bits, truncate afterwards.
+			return new DFloat { value = (int)Div((long)(a.value) * Res, (long)f.value) };
+		}
 
 		public static bool operator ==(DFloat a, DFloat b) {
 			return (a.value == b.value);

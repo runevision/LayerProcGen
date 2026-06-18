@@ -1,14 +1,11 @@
-﻿using Unity.Burst;
+using Runevision.Common;
+using Unity.Burst;
 using Unity.Mathematics;
 
-[BurstCompile]
-class TerrainDeformationMethod {
+[BurstCompile(CompileSynchronously = true)]
+static class PathsBurstMethod {
 
 	// PathPoint props: float4: innerWidth, outerWidth, splatWidth, centerElevation
-
-	static float mod(float a, float b) {
-		return a - b * math.floor(a / b);
-	}
 
 	static float inverselerp(float a, float b, float value) {
 		return (value - a) / (b - a);
@@ -19,9 +16,9 @@ class TerrainDeformationMethod {
 		return (t * t * (3.0f - 2.0f * t));
 	}
 
-	static float4 LineSegment(in float2 p, in float3 a, in float3 b, in float4 propsA, in float4 propsB, ref float3 minDist) {
-		float2 ap = p - a.xz;
-		float2 ab = b.xz - a.xz;
+	static float4 LineSegment(in DPoint p, in DPoint3 a, in DPoint3 b, in float4 propsA, in float4 propsB, ref float3 minDist) {
+		float2 ap = (float2)(p - a.xz);
+		float2 ab = (float2)(b.xz - a.xz);
 		float sqrSegmentLength = math.dot(ab, ab);
 
 		// Where on the segment are we? (0 = a, 1 = b)
@@ -57,7 +54,7 @@ class TerrainDeformationMethod {
 		influence = smoothstep(influence);
 
 		// Interpolated height.
-		float height = math.lerp(a.y, b.y, alongSegment);
+		float height = math.lerp((float)a.y, (float)b.y, alongSegment);
 		// Calculate and apply height elevation at center.
 		float distUnclamped = math.length(ap - ab * alongSegment);
 		float centerInfluence = inverselerp(props.x, props.x * 0.5f, distUnclamped);
@@ -71,42 +68,47 @@ class TerrainDeformationMethod {
 		return new float4(weight, influence * weight, height * weight, splat);
 	}
 
-	[BurstCompile]
-	public static void ApplySpecs(
-		in PointerArray<SpecData> specDatas,
-		in PointerArray<SpecPointB> specPoints,
-		uint specCount,
+	[BurstDiscard]
+	static void DebugLogNonBurst() {
+		Logg.LogError("Not burst compiled!");
+	}
+
+	[BurstCompile(CompileSynchronously = true)]
+	public static void ComputePaths(
+		in PointerArray<PathData> pathDatas,
+		in PointerArray<PathPointB> pathPoints,
+		int pathCount,
 		int GridOffsetX,
 		int GridOffsetY,
-		uint GridSizeX,
-		uint GridSizeY,
-		in float2 CellSize,
+		int GridSizeX,
+		int GridSizeY,
+		in DFloat CellSize,
 		// output
 		ref PointerArray<float> heights,
 		ref PointerArray<float3> dists,
-		ref PointerArray<float4> splats
+		ref PointerArray<Splat> splats
 	) {
-		for (uint x = 0; x < GridSizeX; x++) {
-			for (uint y = 0; y < GridSizeY; y++) {
-				uint index = x + y * GridSizeX;
+		DebugLogNonBurst();
+		for (int x = 0; x < GridSizeX; x++) {
+			for (int y = 0; y < GridSizeY; y++) {
+				int index = x + y * GridSizeX;
 
-				// We have to cast unsigned id to floats before adding to signed grid offset,
-				// otherwise it appears we lose negative numbers.
-				float2 p = new float2((GridOffsetX + (float)x), (GridOffsetY + (float)y)) * CellSize;
+				DPoint p = new Point(GridOffsetX + x, GridOffsetY + y) * CellSize;
 
 				float4 col = new float4(0,0,0,0);
-				float4 splat = new float4(0,0,0,0);
+				Splat splat = new Splat();
 				float3 dist = dists[index];
 
 				uint offset = 0;
-				for (uint i = 0; i < specCount; i++) {
-					uint count = (uint)specDatas[i].pointCount;
-					float4 bounds = specDatas[i].bounds;
-					if (p.x > bounds.x && p.y > bounds.y && p.x < bounds.z && p.y < bounds.w) {
-						float4 currentSplat = specDatas[i].splat;
+				for (uint i = 0; i < pathCount; i++) {
+					uint count = (uint)pathDatas[i].pointCount;
+					DPoint boundsMin = pathDatas[i].boundsMin;
+					DPoint boundsMax = pathDatas[i].boundsMax;
+					if (p.x > boundsMin.x && p.y > boundsMin.y && p.x < boundsMax.x && p.y < boundsMax.y) {
+						Splat currentSplat = pathDatas[i].splat;
 						for (uint j = offset; j < offset + count - 1; j++) {
-							SpecPointB segA = specPoints[j];
-							SpecPointB segB = specPoints[j + 1];
+							PathPointB segA = pathPoints[j];
+							PathPointB segB = pathPoints[j + 1];
 							float4 output = LineSegment(p, segA.pos, segB.pos, segA.props, segB.props, ref dist);
 							col += output;
 							splat += currentSplat * output.x;
@@ -123,7 +125,7 @@ class TerrainDeformationMethod {
 
 				if (influence > 0) {
 					heights[index] = math.lerp(heights[index], height, influence);
-					splats[index] = math.lerp(splats[index], splat, math.saturate(col.w));
+					splats[index] = Splat.Lerp(splats[index], splat, math.saturate(col.w));
 				}
 			}
 		}
