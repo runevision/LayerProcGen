@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['warnaboutmissingdependencies_0',['WarnAboutMissingDependencies',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#aa39b7a917e436c13e97e98dc0251acea',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]]
+  ['setinitialorigin_0',['SetInitialOrigin',['../classRunevision_1_1Common_1_1FloatingOrigin.html#a045b467527ccc5ad39a5685a227aa7e8',1,'Runevision::Common::FloatingOrigin']]],
+  ['setorigin_1',['SetOrigin',['../classRunevision_1_1Common_1_1FloatingOrigin.html#a59079a61b29edaa183a7c6b2537176a7',1,'Runevision::Common::FloatingOrigin']]]
 ];

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['handleallabstractchunks_0',['HandleAllAbstractChunks',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#a78e4b87e28fa40ff858facb8502daef0',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]],
-  ['handleallchunks_1',['HandleAllChunks',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#a03b76a3b616c7271887284318076f290',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]],
-  ['handlechunksinbounds_2',['HandleChunksInBounds',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#a13fb3ba3ff7cdf6cb14d9077296e6fc8',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]],
-  ['handledependenciesforlevel_3',['HandleDependenciesForLevel',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#a2756c6af24a7856d4e416985492d68ad',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]],
-  ['handlegridpoints_4',['HandleGridPoints',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html#a99c32d6ff1770619c62f1bc6dc031518',1,'Runevision::LayerProcGen::ChunkBasedDataLayer']]],
-  ['haslayer_3c_20t_20_3e_5',['HasLayer&lt; T &gt;',['../classRunevision_1_1LayerProcGen_1_1AbstractDataLayer.html#a97f491b26e3f89b1b7b032bb9a30a33d',1,'Runevision::LayerProcGen::AbstractDataLayer']]]
+  ['get_0',['Get',['../classRunevision_1_1Common_1_1ArrayPool-1-g.html#a900d49e0674ea11409f4fa6d3284ff34',1,'Runevision.Common.ArrayPool-1-g.Get()'],['../interfaceRunevision_1_1Common_1_1IPool-1-g.html#ae25a8d58a6b45cb68029ab1a355e9a75',1,'Runevision.Common.IPool-1-g.Get()'],['../classRunevision_1_1Common_1_1ListPool-1-g.html#a62be82b0a6cccb47ee748b97170911a8',1,'Runevision.Common.ListPool-1-g.Get()'],['../classRunevision_1_1Common_1_1ObjectPool-1-g.html#ae25a8d58a6b45cb68029ab1a355e9a75',1,'Runevision.Common.ObjectPool-1-g.Get()']]],
+  ['getchunkofgridpoint_1',['GetChunkOfGridPoint',['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer-2-g.html#ab2b00fb23bfe8b7885d8c9f192c8fba1',1,'Runevision.LayerProcGen.ChunkBasedDataLayer-2-g.GetChunkOfGridPoint(ILC q, Point gridPoint, Point chunkGridSize, out C chunk, out Point localPointInChunk)'],['../classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer-2-g.html#aa00ae92e0698eac8b1bd7de6187aaeb7',1,'Runevision.LayerProcGen.ChunkBasedDataLayer-2-g.GetChunkOfGridPoint(ILC q, int x, int y, int chunkGridW, int chunkGridH, out C chunk, out Point localPointInChunk)']]],
+  ['getlevelcount_2',['GetLevelCount',['../classRunevision_1_1LayerProcGen_1_1AbstractChunkBasedDataLayer.html#a49d3485855b677d6f9c2c276724adbab',1,'Runevision::LayerProcGen::AbstractChunkBasedDataLayer']]],
+  ['globalget_3',['GlobalGet',['../classRunevision_1_1Common_1_1ObjectPool-1-g.html#a446cc4266040ea1afbc4d20f3c23e74c',1,'Runevision::Common::ObjectPool-1-g']]],
+  ['globalreturn_4',['GlobalReturn',['../classRunevision_1_1Common_1_1ObjectPool-1-g.html#a1c672cf3599ff4e8996638206b80052a',1,'Runevision::Common::ObjectPool-1-g']]],
+  ['globalreturnall_5',['GlobalReturnAll',['../classRunevision_1_1Common_1_1ObjectPool-1-g.html#a1dd97744984b7de823d1fac8769f142c',1,'Runevision::Common::ObjectPool-1-g']]]
 ];
