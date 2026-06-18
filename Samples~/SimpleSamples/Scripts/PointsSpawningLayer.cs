@@ -27,14 +27,17 @@ public class PointsSpawningChunk : LayerChunk<PointsSpawningLayer, PointsSpawnin
 			// Otherwise the action executing delayed on the main thread may use incorrect
 			// newer values stored in the same outer variables, which may even reference a
 			// newer incarnation of a chunk that has been recycled and reused in the mean time.
-			chunkParent = new TransformWrapper(PointsSpawningLayer.instance.layerParent, index);
+			chunkParent = new TransformWrapper(PointsSpawningLayer.instance.layerParent, index, worldOffset.xoy);
 			TransformWrapper currentChunkParent = chunkParent; // Capture current chunk parent.
 			foreach (Point point in points) {
-				Point currentPoint = point; // Capture current point in foreach loop.
+				// Capture current point in foreach loop.
+				Point currentPoint = point - worldOffset;
+				
+				// Create sphere on main thread.
 				MainThreadActionQueue.Enqueue(() => {
-					Transform tr = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
-					tr.position = new Vector3(currentPoint.x, 0f, currentPoint.y);
-					tr.localScale = Vector3.one * 50f;
+					Transform tr = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+					tr.position = new Vector3(currentPoint.x, 100f, currentPoint.y);
+					tr.localScale = new Vector3(50f, 200f, 50f);
 					currentChunkParent.AddChild(tr);
 				});
 			}
@@ -47,8 +50,8 @@ public class PointsSpawningChunk : LayerChunk<PointsSpawningLayer, PointsSpawnin
 
 public class PointsSpawningLayer : ChunkBasedDataLayer<PointsSpawningLayer, PointsSpawningChunk> {
 	// Specify the world space dimensions of the chunks.
-	public override int chunkW { get { return 100; } }
-	public override int chunkH { get { return 100; } }
+	public override int chunkW { get { return 300; } }
+	public override int chunkH { get { return 300; } }
 
 	// A Transform parent for all objects spawned by this layer.
 	public Transform layerParent;

@@ -6,7 +6,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Runevision.Common {
 
@@ -42,6 +45,18 @@ namespace Runevision.Common {
 		public static void ReturnToPool (this IPoolable element) {
 			Return (element);
 		}*/
+
+		public static void LogUsageStats() {
+			lock (PoolManager.allPools) {
+				var sorted = PoolManager.allPools.OrderBy(e => e.ToString());
+				StringBuilder logString = new StringBuilder($"Pool stats {DateTime.Now}\n");
+				foreach (IPool pool in sorted) {
+					logString.AppendFormat("{1,5} capacity ({2,5} active, {3,5} inactive)  {0}\n",
+						pool, pool.CountAll, pool.CountActive, pool.CountInactive);
+				}
+				Console.WriteLine(logString.ToString());
+			}
+		}
 	}
 
 }

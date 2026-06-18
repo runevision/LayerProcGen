@@ -27,7 +27,7 @@ namespace Runevision.Common {
 		}
 
 		// User-defined conversion from Point to Vector2
-		public static implicit operator Vector2(Point p) {
+		public static explicit operator Vector2(Point p) {
 			return new Vector2(p.x, p.y);
 		}
 
@@ -52,7 +52,7 @@ namespace Runevision.Common {
 		}
 
 		// User-defined conversion from Point to float2
-		public static implicit operator float2(Point p) {
+		public static explicit operator float2(Point p) {
 			return new float2(p.x, p.y);
 		}
 

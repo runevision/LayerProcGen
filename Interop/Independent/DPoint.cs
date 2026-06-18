@@ -68,6 +68,14 @@ namespace Runevision.Common {
 			return new DPoint(a.x * f, a.y * f);
 		}
 
+		public static DPoint operator *(DPoint a, DFloat f) {
+			return new DPoint(a.x * f, a.y * f);
+		}
+
+		public static DPoint operator *(DPoint a, DPoint b) {
+			return new DPoint(a.x * b.x, a.y * b.y);
+		}
+
 		public static DPoint operator *(DPoint a, Point b) {
 			return new DPoint(a.x * b.x, a.y * b.y);
 		}
@@ -78,6 +86,14 @@ namespace Runevision.Common {
 
 		public static DPoint operator /(DPoint a, int f) {
 			return new DPoint(a.x / f, a.y / f);
+		}
+
+		public static DPoint operator /(DPoint a, DFloat f) {
+			return new DPoint(a.x / f, a.y / f);
+		}
+
+		public static DPoint operator /(DPoint a, DPoint b) {
+			return new DPoint(a.x / b.x, a.y / b.y);
 		}
 
 		public static bool operator ==(DPoint a, DPoint b) {
@@ -131,6 +147,10 @@ namespace Runevision.Common {
 
 		public static float Distance(DPoint a, DPoint b) {
 			return (b - a).magnitude;
+		}
+
+		public Point RoundToPoint() {
+			return new Point(x.RoundToInt(), y.RoundToInt());
 		}
 	}
 

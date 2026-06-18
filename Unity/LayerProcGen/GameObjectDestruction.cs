@@ -25,9 +25,8 @@ namespace Runevision.LayerProcGen {
 			if (transform.transform != null) {
 				if (destroyMeshes)
 					transform.transform.gameObject.DestroyIncludingMeshes();
-				else
-					transform.transform.gameObject.Destroy();
 			}
+			transform.Destroy();
 		}
 
 		/// <summary>

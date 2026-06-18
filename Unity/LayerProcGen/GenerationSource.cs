@@ -53,15 +53,13 @@ namespace Runevision.LayerProcGen {
 			Vector3 focusPos = transform.position;
 			Point focus;
 			if (LayerManagerBehavior.instance.generationPlane == LayerManagerBehavior.GenerationPlane.XZ)
-				focus = (Point)(focusPos.xz());
+				focus = (Point)(focusPos.xz()) + FloatingOrigin.origin.xz;
 			else
-				focus = (Point)(focusPos.xy());
-			if (!dep.isActive || focus != dep.focus)
-				dep.SetFocus(focus);
-			
+				focus = (Point)(focusPos.xy()) + FloatingOrigin.origin.xy;
+			dep.SetFocus(focus);
+
 			Point safeSize = Point.Max(Point.one, size);
-			if (!dep.isActive || dep.size != safeSize)
-				dep.SetSize(safeSize);
+			dep.SetSize(safeSize);
 		}
 	}
 

@@ -5,25 +5,25 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
-	public List<PathSpec> paths = new List<PathSpec>();
+	public List<TerrainPath> paths = new List<TerrainPath>();
 
 	float[,] heights;
 	Vector3[,] dists;
-	Vector4[,] splats;
+	Splat[,] splats;
 
 	Point gridOrigin;
 
 	public CultivationChunk() {
 		heights = new float[layer.gridSize.y, layer.gridSize.x];
 		dists = new Vector3[layer.gridSize.y, layer.gridSize.x];
-		splats = new Vector4[layer.gridSize.y, layer.gridSize.x];
+		splats = new Splat[layer.gridSize.y, layer.gridSize.x];
 	}
 
 	public override void Create(int level, bool destroy) {
 		if (destroy) {
 			foreach (var path in paths) {
-				PathSpec pathCopy = path;
-				ObjectPool<PathSpec>.GlobalReturn(ref pathCopy);
+				TerrainPath terrainPathCopy = path;
+				ObjectPool<TerrainPath>.GlobalReturn(ref terrainPathCopy);
 			}
 			paths.Clear();
 			heights.Clear();
@@ -34,8 +34,6 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 			Build();
 		}
 	}
-
-	static ListPool<LocationSpec> locationSpecListPool = new ListPool<LocationSpec>(128);
 
 	void Build() {
 		// We use a grid that covers an area larger than the chunk itself,
@@ -58,9 +56,10 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 #if UNITY_EDITOR
 			Point indexClamped = Point.Min(Point.Max(index, Point.zero), gridSize - Point.one);
 			if (indexClamped != index) {
+				DebugDrawer.DrawRay(p.xoy, DPoint3.up * 1000, Color.red, 1000);
+				Logg.LogError($"Accessing dists array out of bounds. p={p} index={index} indexClamped={indexClamped} gridSize={gridSize} chunkIndex={this.index}");
+				LayerManager.instance.Unload();
 				index = indexClamped;
-				DebugDrawer.DrawRay(new Vector3((float)p.x, 0, (float)p.y), Vector3.up * 1000, Color.red, 1000);
-				Logg.LogError("Accessing heights array out of bounds.");
 			}
 #endif
 			return heights[index.y, index.x];
@@ -71,9 +70,10 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 #if UNITY_EDITOR
 			Point indexClamped = Point.Min(Point.Max(index, Point.zero), gridSize - Point.one);
 			if (indexClamped != index) {
+				DebugDrawer.DrawRay(p.xoy, DPoint3.up * 1000, Color.red, 1000);
+				Logg.LogError($"Accessing dists array out of bounds. p={p} index={index} indexClamped={indexClamped} gridSize={gridSize} chunkIndex={this.index}");
+				LayerManager.instance.Unload();
 				index = indexClamped;
-				DebugDrawer.DrawRay(new Vector3((float)p.x, 0, (float)p.y), Vector3.up * 1000, Color.red, 1000);
-				Logg.LogError("Accessing dists array out of bounds.");
 			}
 #endif
 			// Penalty for overlapping locations.
@@ -107,7 +107,7 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 
 		// Note: Ensure start and goal positions are multiples of cellSize,
 		// or else the pathfinding will fail!
-		float half = TerrainPathFinder.halfCellSize;
+		float half = (float)TerrainPathFinder.halfCellSize;
 		Point a = Crd.RoundToPeriod((Point)(locA.position + (DPoint)(locA.frontDir * (locA.radius - half))), TerrainPathFinder.cellSize);
 		Point b = Crd.RoundToPeriod((Point)(locB.position + (DPoint)(locB.frontDir * (locB.radius - half))), TerrainPathFinder.cellSize);
 
@@ -131,17 +131,17 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 		dPoints[last]  = locB.position + (DPoint)dirB;
 
 		// Create list of 3D points with heights from the 2D points.
-		var points = PathSpec.pointListPool.Get();
+		var points = TerrainPath.pointListPool.Get();
 		foreach (var dPoint in dPoints) {
 			points.Add(GetPointWithHeight(dPoint, heightFunction));
 		}
 		dPointListPool.Return(ref dPoints); // 2D points are no longer needed.
 
 		// Create a path deformation specification from the points.
-		PathSpec path = ObjectPool<PathSpec>.GlobalGet().Init(points, 0, 2.5f, 1.5f, 2.7f, 0f);
-		PathSpec.pointListPool.Return(ref points); // 3D points are no longer needed.
-		path.CalculateBounds();
-		paths.Add(path);
+		TerrainPath terrainPath = ObjectPool<TerrainPath>.GlobalGet().Init(points, 0, 2.5f, 1.5f, 2.7f, 0f);
+		TerrainPath.pointListPool.Return(ref points); // 3D points are no longer needed.
+		terrainPath.CalculateBounds();
+		paths.Add(terrainPath);
 
 		SimpleProfiler.End(ph);
 	}
@@ -159,58 +159,58 @@ public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 
 	public void DebugDraw(float drawPaths, float drawOrigPaths, float drawPathBounds) {
 		for (int p = 0; p < paths.Count; p++) {
-			PathSpec path = paths[p];
-			path.DebugDraw(drawPaths, drawOrigPaths, drawPathBounds);
+			TerrainPath terrainPath = paths[p];
+			terrainPath.DebugDraw(drawPaths, drawOrigPaths, drawPathBounds);
 		}
 	}
 
 	public void DrawHeights(GridBounds bounds) {
-		int d = TerrainPathFinder.halfCellSize;
+		DFloat d = TerrainPathFinder.halfCellSize;
 		Point o = layer.gridPadding;
 		for (int i = 0; i < layer.gridChunkRes.x; i++) {
-			int x = worldOffset.x + d * i;
+			DFloat x = worldOffset.x + d * i;
 			for (int j = 0; j < layer.gridChunkRes.y; j++) {
-				int z = worldOffset.y + d * j;
-				if (!bounds.Contains(new Point(x, z)))
+				DFloat z = worldOffset.y + d * j;
+				if (!bounds.Contains(new Point((int)x, (int)z)))
 					continue;
 				DebugDrawer.DrawLine(
-					new Vector3(x, heights[o.y + j, o.x + i], z),
-					new Vector3(x + d, heights[o.y + j, o.x + i + 1], z),
+					new DPoint3(x, heights[o.y + j, o.x + i], z),
+					new DPoint3(x + d, heights[o.y + j, o.x + i + 1], z),
 					Color.white);
 				DebugDrawer.DrawLine(
-					new Vector3(x, heights[o.y + j, o.x + i], z),
-					new Vector3(x, heights[o.y + j + 1, o.x + i], z + d),
+					new DPoint3(x, heights[o.y + j, o.x + i], z),
+					new DPoint3(x, heights[o.y + j + 1, o.x + i], z + d),
 					Color.white);
 			}
 		}
 	}
 
 	public void DrawDirections(GridBounds bounds) {
-		int d = TerrainPathFinder.halfCellSize;
+		DFloat d = TerrainPathFinder.halfCellSize;
 		Point o = layer.gridPadding;
 		for (int i = 0; i < layer.gridChunkRes.x; i++) {
-			int x = worldOffset.x + d * i;
+			DFloat x = worldOffset.x + d * i;
 			for (int j = 0; j < layer.gridChunkRes.y; j++) {
-				int z = worldOffset.y + d * j;
-				if (!bounds.Contains(new Point(x, z)))
+				DFloat z = worldOffset.y + d * j;
+				if (!bounds.Contains(new Point((int)x, (int)z)))
 					continue;
 				Vector3 distV = dists[o.y + j, o.x + i];
 				Vector2 dir = distV.xy().normalized;
 				float height = heights[o.y + j, o.x + i];
 				if (distV.z <= 0) {
 					DebugDrawer.DrawLine(
-						new Vector3(x, height, z),
-						new Vector3(x + distV.x, height, z + distV.y),
+						new DPoint3(x, height, z),
+						new DPoint3(x + distV.x, height, z + distV.y),
 						new Color(1, 0, 0, 0.2f));
 				}
 				else {
 					DebugDrawer.DrawLine(
-						new Vector3(x, height, z),
-						new Vector3(x + dir.x * distV.z, height, z + dir.y * distV.z),
+						new DPoint3(x, height, z),
+						new DPoint3(x + dir.x * distV.z, height, z + dir.y * distV.z),
 						new Color(1, 1, 0, 0.2f));
 					DebugDrawer.DrawLine(
-						new Vector3(x + dir.x * distV.z, height, z + dir.y * distV.z),
-						new Vector3(x + distV.x, height, z + distV.y),
+						new DPoint3(x + dir.x * distV.z, height, z + dir.y * distV.z),
+						new DPoint3(x + distV.x, height, z + distV.y),
 						new Color(1, 0, 0, 0.2f));
 				}
 			}
@@ -238,7 +238,7 @@ public class CultivationLayer : ChunkBasedDataLayer<CultivationLayer, Cultivatio
 	static DebugToggle debugDirections = DebugToggle.Create(">Layers/CultivationLayer/Directions");
 
 	public CultivationLayer() {
-		gridChunkRes = chunkSize / TerrainPathFinder.halfCellSize;
+		gridChunkRes = (chunkSize / TerrainPathFinder.cellSize) * 2;
 		// Make the grid for each chunk cover an area extending further our than the chunk.
 		// This ensures the pathfinding can succeed even when it extends partially beyond the chunk.
 		worldSpacePadding = chunkSize;
@@ -274,7 +274,7 @@ public class CultivationLayer : ChunkBasedDataLayer<CultivationLayer, Cultivatio
 		}
 	}
 
-	public void GetPathsOverlappingBounds(ILC q, List<PathSpec> outPaths, GridBounds bounds) {
+	public void GetPathsOverlappingBounds(ILC q, List<TerrainPath> outPaths, GridBounds bounds) {
 		// Add paths within bounds.
 		HandleChunksInBounds(q, bounds.GetExpanded(requiredPadding), 0, chunk => {
 			foreach (var path in chunk.paths)

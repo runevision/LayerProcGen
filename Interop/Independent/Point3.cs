@@ -142,10 +142,6 @@ namespace Runevision.Common {
 
 		public float magnitude { get { return (float)Math.Sqrt(sqrMagnitude); } }
 
-		public static float Distance(DPoint a, DPoint b) {
-			return (b - a).magnitude;
-		}
-
 		public void Serialize(BinaryWriter writer) {
 			writer.Write(x);
 			writer.Write(y);

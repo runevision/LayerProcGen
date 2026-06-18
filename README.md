@@ -46,6 +46,9 @@ The framework arranges chunks in either a horizontal or vertical plane. It can b
 **Multi-threaded**  
 The framework is multi-threaded based on Parallel.ForEach functionality in .Net. The degree of parallelism automatically scales to the number of available cores. When needed, actions can be enqueued to be performed on the main thread.
 
+**Fixed-point coordinates and floating origin**  
+The framework is designed to support large worlds without suffering from floating point precision issues. Calculate your generation in fixed point world space coordinates, subtract the floating origin, and convert the results to the floating point scene space coordinates used by the game engine.
+
 ## Made with LayerProcGen
 
 Released games:
@@ -56,34 +59,13 @@ Games in development:
 
 - [The Big Forest (working title)](https://runevision.com/multimedia/thebigforest/)
 
-## Installation in Unity
+## Getting started
 
-LayerProcGen requires Unity 2019.4 or later.
+For use in Unity, LayerProcGen requires Unity 2019.4 or later:  
+[Getting Started in Unity](https://runevision.github.io/LayerProcGen/md_GettingStarted.html)
 
-Install LayerProcGen as a Unity Package Manager package from this Git URL:
-
-`https://github.com/runevision/LayerProcGen.git#upm`
-
-See [Unity's instructions here](https://docs.unity3d.com/Manual/upm-ui-giturl.html). If you already have Git installed, it's simply these steps:
-
-- Open the Package Manager window via `Window > Package Manager`
-- Click the `+` button and choose `Add package from git URL...`
-- Paste the URL: `https://github.com/runevision/LayerProcGen.git#upm`
-- Click `Add`
-
-### Samples
-
-You can also import samples for how to use the framework on the `Samples` tab of the package.
-
-The *Simple Samples* have no special requirements.
-
-The *Terrain Sample* requires:
-
-- Burst package
-- Input System package
-- Player Settings: Enabling `Allow unsafe code`
-- Player Settings: Setting `Active Input Handling` to `Both`
-- Only tested with Builtin Render Pipeline
+For use in other engines, see:  
+[Using Without Unity](https://runevision.github.io/LayerProcGen/md_UsingWithoutUnity.html)
 
 ## Platform support
 

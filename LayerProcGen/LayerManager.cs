@@ -25,17 +25,21 @@ namespace Runevision.LayerProcGen {
 		public bool isGeneratingInBackground { get; private set; }
 		public bool building { get { return isGeneratingInBackground || !MainThreadActionQueue.idle; } }
 
-		public event Action abort;
 		public bool aborting { get; private set; }
+		internal event Action disposeChunks;
 
 		public List<TopLayerDependency> topDependencies { get; } = new List<TopLayerDependency>();
 		public void AddTopDependency(TopLayerDependency d) {
-			if (!topDependencies.Contains(d))
-				topDependencies.Add(d);
+			lock (topDependencies) {
+				if (!topDependencies.Contains(d))
+					topDependencies.Add(d);
+			}
 		}
 		public void RemoveTopDependency(TopLayerDependency d) {
-			if (topDependencies.Contains(d))
-				topDependencies.Remove(d);
+			lock (topDependencies) {
+				if (topDependencies.Contains(d))
+					topDependencies.Remove(d);
+			}
 		}
 
 		Thread layerUpdateThread;
@@ -60,24 +64,29 @@ namespace Runevision.LayerProcGen {
 		}
 
 		public void Unload() {
-			layerUpdateThread.Abort();
-			do {
-				lock (topDependencies) {
-					for (int i = 0; i < topDependencies.Count; i++) {
-						topDependencies[i].isActive = false;
-					}
-				}
-				//yield return null;
-			} while (building);
+			if (aborting)
+				return;
+			aborting = true;
+			layerUpdateThread.Join();
+
+			// Call chunk Dispose methods to dispose native resources such as NativeArrays.
+			// It may be impossible to avoid InvalidOperationExceptions in certain cases
+			// https://issuetracker.unity3d.com/issues/array-is-marked-as-undisposable-when-using-asyncgpureadback-dot-requestintonativearray
+			// so catch those and only warn about them.
+			try {
+				disposeChunks?.Invoke();
+			}
+			catch (InvalidOperationException e) {
+				Logg.LogWarning("Caught exception in dispose: " + e.Message);
+			}
+			disposeChunks = null;
 
 			AbstractDataLayer.ResetInstances();
 			instance = null;
 		}
 
 		public void OnDestroy() {
-			aborting = true;
-			layerUpdateThread.Join();
-			abort?.Invoke();
+			Unload();
 		}
 
 		void LayerUpdateThread() {
@@ -98,32 +107,35 @@ namespace Runevision.LayerProcGen {
 
 					isGeneratingInBackground = true;
 					lock (topDependencies) {
+						// Process updated active top dependencies, including new ones.
 						for (int i = 0; i < topDependencies.Count; i++) {
 							TopLayerDependency dep = topDependencies[i];
-							// Generate to address changed top dependencies.
-							if (dep.changed) {
+							if (dep.changed && dep.isActive) {
 								dep.abstractLayer.ProcessTopDependency(dep);
 								WorkTracker.WorkIsKnown(dep.layer.GetType());
-
-								// Remove inactive top dependencies.
-								if (!dep.isActive) {
-									RemoveTopDependency(dep);
-								}
+							}
+						}
+						// Process and remove inactive top dependencies.
+						// We do this afterwards to avoid a chunk being briefly removed
+						// in cases where one top layer dependency was removed but another
+						// which depends on the same chunk was added at the same time.
+						for (int i = 0; i < topDependencies.Count; i++) {
+							TopLayerDependency dep = topDependencies[i];
+							if (!dep.isActive) {
+								dep.abstractLayer.ProcessTopDependency(dep);
+								WorkTracker.WorkIsKnown(dep.layer.GetType());
+								RemoveTopDependency(dep);
 							}
 						}
 					}
 
 					SimpleProfiler.End(ph);
 
-					if (SimpleProfiler.AnyCurrent())
-						SimpleProfiler.Log();
-					lock (PoolManager.allPools) {
-						var sorted = PoolManager.allPools.OrderBy(e => e.ToString());
-						foreach (IPool pool in sorted) {
-							Console.WriteLine("Pool {0} {1,6} capacity ({2,6} active, {3,6} inactive)",
-								pool.ToString().PadRight(50, '.'),
-								pool.CountAll, pool.CountActive, pool.CountInactive);
-						}
+					if (SimpleProfiler.AnyCurrent()) {
+						if (logGenerationStats.enabled)
+							SimpleProfiler.Log();
+						else
+							SimpleProfiler.ResetStats();
 					}
 				}
 				else {
@@ -133,6 +145,9 @@ namespace Runevision.LayerProcGen {
 				}
 			}
 		}
+
+		static DebugToggle logGenerationStats = DebugToggle.Create(">Logging/Generation Stats", true);
+		static DebugButton logPoolStatsNow = DebugButton.Create(">Logging/Log Pool Stats", PoolManager.LogUsageStats);
 	}
 
 }

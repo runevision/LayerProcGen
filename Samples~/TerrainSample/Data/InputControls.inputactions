@@ -1,5 +1,5 @@
 {
-    "name": "Controls",
+    "name": "InputControls",
     "maps": [
         {
             "name": "PlayerMap",
@@ -203,6 +203,54 @@
                     "processors": "",
                     "groups": "",
                     "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debug",
+            "id": "d3d54718-fec6-4b48-8dd3-1f41f2bd6695",
+            "actions": [
+                {
+                    "name": "DebugToggle",
+                    "type": "Button",
+                    "id": "cdbb57c7-ae20-485c-b6c4-cfddb4853423",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Screenshot",
+                    "type": "Button",
+                    "id": "7cbccf62-17b2-40c1-88b4-1abc055ff4ee",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b66051e0-25a1-43a1-9c8f-4db04366b37f",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebugToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aca5ff7c-45f5-45c7-9944-6ed91a7359a3",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Screenshot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

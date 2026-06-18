@@ -351,6 +351,20 @@ namespace Runevision.Common {
 		public float Range(float min, float max, int x, int y, int z) {
 			return min + (GetHash(x, y, z) * (max - min)) / uint.MaxValue;
 		}
+
+		public DFloat Range(DFloat min, DFloat max, params int[] data) {
+			return min + Range(0f, (float)(max - min), data);
+		}
+		// Potentially optimized overloads for few parameters.
+		public DFloat Range(DFloat min, DFloat max, int data) {
+			return min + Range(0f, (float)(max - min), data);
+		}
+		public DFloat Range(DFloat min, DFloat max, int x, int y) {
+			return min + Range(0f, (float)(max - min), x, y);
+		}
+		public DFloat Range(DFloat min, DFloat max, int x, int y, int z) {
+			return min + Range(0f, (float)(max - min), x, y, z);
+		}
 	}
 
 }

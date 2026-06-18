@@ -130,7 +130,11 @@ namespace Runevision.LayerProcGen {
 			for (int i = 0; i < levelCount; i++) {
 				levelLocks[i] = new object();
 			}
+
+			LayerManager.instance.disposeChunks += Dispose;
 		}
+
+		protected virtual void Dispose() { }
 
 		internal void IncrementUserCountOfLevel(int requestedLevel) {
 			lock (chunkLevels) {

@@ -23,11 +23,11 @@ namespace Runevision.LayerProcGen {
 	/// <remarks>
 	/// The manager can visualize chunk bounds, layer bounds, layer dependencies,
 	/// and has hooks for letting you display your own debug layer visualizations.
-	/// 
+	///
 	/// <para>To use it, add the VisualizationManager component to a GameObject in Unity.
 	/// For each layer you want to visualize, add an entry in the Layers list where you
 	/// select the layer in the dropdown, and choose a color for that layer.</para>
-	/// 
+	///
 	/// <para>When the game is running, the VisualizationManager is controlled via
 	/// <see cref="DebugOption">DebugOptions</see>. In the debug options you need to both
 	/// enable the <c>LayerVis</c> toggle and each layer you want visualized under the
@@ -53,12 +53,20 @@ namespace Runevision.LayerProcGen {
 			public GUIContent nameContent;
 			public float depthValue;
 			public float depthValueRaw;
-			public Vector2 center;
-			public Vector2 size;
+			public DPoint center;
+			public DPoint size;
 			public DebugToggle debugLayerLevel;
 			public DebugToggle debugLayer;
 			public LayerSpec layerSpec;
 			public Color color { get { return layerSpec.color; } }
+			public Vector3 centerInScene {
+				get {
+					DPoint3 centerWorld = center.xyo;
+					centerWorld.z = depthValue;
+					centerWorld = FlipYZ(centerWorld);
+					return (Vector3)(centerWorld - FloatingOrigin.origin);
+				}
+			}
 
 			public LayerLevelVis(IChunkBasedDataLayer layer, int level, LayerSpec layerSpec) {
 				this.layer = layer;
@@ -87,7 +95,7 @@ namespace Runevision.LayerProcGen {
 		public List<LayerSpec> layers = new List<LayerSpec>();
 
 		public enum SeparationUnit { WorldUnits, Chunks }
-		
+
 		[Header("Layer Spacing")]
 		public float worldOffset;
 		public SeparationUnit spacingUnit = SeparationUnit.Chunks;
@@ -172,8 +180,8 @@ namespace Runevision.LayerProcGen {
 		void DebugDrawBoundsOfLevel(AbstractLayerChunk chunk, float depth, Color color, float padding) {
 			Color col = color;
 			DebugDrawer.DrawRect(
-				chunk.bounds.min + Vector2.one * padding,
-				chunk.bounds.max - Vector2.one * padding,
+				chunk.bounds.min + Point.one * (DFloat)padding,
+				chunk.bounds.max - Point.one * (DFloat)padding,
 				depth, col);
 		}
 
@@ -184,8 +192,8 @@ namespace Runevision.LayerProcGen {
 				Color col = Color.white;
 				col.a = debugSources.animAlpha;
 				foreach (TopLayerDependency topDep in topDependencies) {
-					Vector2 min = topDep.focus - (Vector2)topDep.size * 0.5f;
-					Vector2 max = min + (Vector2)topDep.size;
+					DPoint min = topDep.focus - topDep.size * (DFloat)0.5f;
+					DPoint max = min + topDep.size;
 					DebugDrawer.DrawRect(min, max, 0f, col);
 
 					if (debugDependencies.visible) {
@@ -200,7 +208,7 @@ namespace Runevision.LayerProcGen {
 					}
 				}
 			}
-			
+
 			// Draw layers.
 			float layerSeparation = debugSeparate.animValue;
 			float sign = DebugDrawer.xzMode ? -1 : 1;
@@ -236,6 +244,10 @@ namespace Runevision.LayerProcGen {
 			}
 		}
 
+		Point minIndex;
+		Point maxIndex;
+		bool any;
+		Action<AbstractLayerChunk> calculateMinMaxIndex;
 		void UpdateLayer(IChunkBasedDataLayer layer, int level) {
 			var vis = GetVisualizationInfo(layer, level);
 			if (!vis.debugLayerLevel.visible)
@@ -243,19 +255,22 @@ namespace Runevision.LayerProcGen {
 
 			// Calculate center and size.
 			Point chunkSize = layer.chunkSize;
-			Point minIndex = new Point(int.MaxValue, int.MaxValue);
-			Point maxIndex = new Point(int.MinValue, int.MinValue);
-			bool any = false;
-			layer.HandleAllAbstractChunks(level, c => {
-				minIndex = Point.Min(minIndex, c.index);
-				maxIndex = Point.Max(maxIndex, c.index);
-				any = true;
-			});
+			minIndex = new Point(int.MaxValue, int.MaxValue);
+			maxIndex = new Point(int.MinValue, int.MinValue);
+			any = false;
+			if (calculateMinMaxIndex == null) {
+				calculateMinMaxIndex = c => {
+					minIndex = Point.Min(minIndex, c.index);
+					maxIndex = Point.Max(maxIndex, c.index);
+					any = true;
+				};
+			}
+			layer.HandleAllAbstractChunks(level, calculateMinMaxIndex);
 			if (!any)
 				return;
 
-			vis.center = (Vector2)((minIndex + maxIndex + Point.one) * chunkSize) * 0.5f;
-			vis.size = (Vector2)((maxIndex + Point.one - minIndex) * chunkSize);
+			vis.size = (maxIndex + Point.one - minIndex) * chunkSize;
+			vis.center = minIndex * chunkSize + vis.size / 2;
 
 			// Get layer color and opacity.
 			float alpha = vis.debugLayerLevel.animAlpha;
@@ -287,9 +302,9 @@ namespace Runevision.LayerProcGen {
 
 		void DrawBoxLayerBounds(LayerLevelVis vis, IChunkBasedDataLayer layer, int level, Color col) {
 			float depth = vis.depthValue;
-			
-			Vector3 min = vis.center - vis.size * 0.5f;
-			Vector3 max = vis.center + vis.size * 0.5f;
+
+			DPoint min = vis.center - vis.size / 2;
+			DPoint max = vis.center + vis.size / 2;
 
 			// Draw layer dependencies.
 			if (debugDependencies.visible) {
@@ -320,16 +335,15 @@ namespace Runevision.LayerProcGen {
 		// Temporary structures used in DrawExactLayerBounds.
 		static Dictionary<Point, byte> borderDict = new Dictionary<Point, byte>();
 		static HashSet<Point> usedCorners = new HashSet<Point>();
-		static List<Vector2> corners = new List<Vector2>();
+		static List<DPoint> corners = new List<DPoint>();
 		static readonly Point[] dirs = new Point[] { Point.right, Point.up, -Point.right, -Point.up };
 
-		void SetBorderBit(int bit, Point p) {
-			byte value = 0;
-			borderDict.TryGetValue(p, out value);
+		static void SetBorderBit(int bit, Point p) {
+			borderDict.TryGetValue(p, out byte value);
 			value |= (byte)(1 << bit);
 			borderDict[p] = value;
 		}
-		
+
 		void DrawExactLayerBounds(LayerLevelVis vis, IChunkBasedDataLayer layer, int level, Color col) {
 			borderDict.Clear();
 			usedCorners.Clear();
@@ -384,10 +398,10 @@ namespace Runevision.LayerProcGen {
 									break;
 								}
 							}
-							corners.Add((Vector2)lastCorner * chunkSize);
-							corners.Add((Vector2)lastCornerDir);
-							corners.Add((Vector2)p * chunkSize);
-							corners.Add((Vector2)cornerDir);
+							corners.Add(lastCorner * chunkSize);
+							corners.Add(lastCornerDir);
+							corners.Add(p * chunkSize);
+							corners.Add(cornerDir);
 							lastCornerDir = cornerDir;
 							if (p == start)
 								break;
@@ -417,8 +431,8 @@ namespace Runevision.LayerProcGen {
 			// Draw layer bounds.
 			float depth = vis.depthValue;
 			for (int i = 0; i < corners.Count; i += 4) {
-				Vector3 p1 = corners[i + 0];
-				Vector3 p2 = corners[i + 2];
+				DPoint3 p1 = corners[i + 0].xyo;
+				DPoint3 p2 = corners[i + 2].xyo;
 				p1.z = p2.z = depth;
 				DebugDrawer.DrawLine(FlipYZ(p1), FlipYZ(p2), col);
 			}
@@ -427,7 +441,7 @@ namespace Runevision.LayerProcGen {
 		static void DrawBoxDependency(
 			LayerLevelVis vis,
 			LayerLevelVis depVis,
-			Vector3 min, Vector3 max, int hPadding, int vPadding, Color col, bool drawProjection
+			DPoint min, DPoint max, int hPadding, int vPadding, Color col, bool drawProjection
 		) {
 			if (depVis == null || !depVis.debugLayerLevel.visible)
 				return;
@@ -437,40 +451,40 @@ namespace Runevision.LayerProcGen {
 			dCol.a *= depVis.debugLayerLevel.animAlpha;
 			DrawBoxDependency(min, max, hPadding, vPadding, depth, depthDif, dCol, drawProjection);
 		}
-		
+
 		static void DrawBoxDependency(
-			Vector3 min, Vector3 max, int hPadding, int vPadding,
+			DPoint min, DPoint max, int hPadding, int vPadding,
 			float depth, float depthDif, Color col, bool drawProjection
 		) {
 			col.a *= 0.5f;
 
 			// Draw lines connecting the two layers.
 			DebugDrawer.DrawRay(
-				FlipYZ(new Vector3(min.x, min.y, depth)),
-				FlipYZ(new Vector3(-hPadding, -vPadding, depthDif)), col);
+				FlipYZ(new DPoint3(min.x, min.y, depth)),
+				FlipYZ(new DPoint3(-hPadding, -vPadding, depthDif)), col);
 			DebugDrawer.DrawRay(
-				FlipYZ(new Vector3(max.x, min.y, depth)),
-				FlipYZ(new Vector3(hPadding, -vPadding, depthDif)), col);
+				FlipYZ(new DPoint3(max.x, min.y, depth)),
+				FlipYZ(new DPoint3(hPadding, -vPadding, depthDif)), col);
 			DebugDrawer.DrawRay(
-				FlipYZ(new Vector3(min.x, max.y, depth)),
-				FlipYZ(new Vector3(-hPadding, vPadding, depthDif)), col);
+				FlipYZ(new DPoint3(min.x, max.y, depth)),
+				FlipYZ(new DPoint3(-hPadding, vPadding, depthDif)), col);
 			DebugDrawer.DrawRay(
-				FlipYZ(new Vector3(max.x, max.y, depth)),
-				FlipYZ(new Vector3(hPadding, vPadding, depthDif)), col);
+				FlipYZ(new DPoint3(max.x, max.y, depth)),
+				FlipYZ(new DPoint3(hPadding, vPadding, depthDif)), col);
 
 			// Draw layers projecting dependency area onto depended on layer.
 			if (drawProjection) {
-				min -= new Vector3(hPadding, vPadding, 0f);
-				max += new Vector3(hPadding, vPadding, 0f);
+				min -= new DPoint(hPadding, vPadding);
+				max += new DPoint(hPadding, vPadding);
 				depth += depthDif;
-				DebugDrawer.DrawRect(min, max, depth, col);
+				DebugDrawer.DrawRect(min, max, (DFloat)depth, col);
 			}
 		}
 
 		static void DrawExactDependency(
 			LayerLevelVis vis,
 			LayerLevelVis depVis,
-			List<Vector2> corners, int hPadding, int vPadding, Color col, bool drawProjection
+			List<DPoint> corners, int hPadding, int vPadding, Color col, bool drawProjection
 		) {
 			if (depVis == null || !depVis.debugLayerLevel.visible)
 				return;
@@ -482,19 +496,19 @@ namespace Runevision.LayerProcGen {
 		}
 
 		static void DrawExactDependency(
-			List<Vector2> corners, int hPadding, int vPadding,
+			List<DPoint> corners, int hPadding, int vPadding,
 			float depth, float depthDif, Color col, bool drawProjection
 		) {
 			col.a *= 0.5f;
 			for (int i = 0; i < corners.Count; i += 4) {
-				Vector3 p1 = corners[i + 0];
-				Vector3 p2 = corners[i + 2];
+				DPoint3 p1 = corners[i + 0].xyo;
+				DPoint3 p2 = corners[i + 2].xyo;
 				p1.z = p2.z = depth;
-				Vector3 v1 = corners[i + 1];
+				DPoint3 v1 = corners[i + 1].xyo;
 				v1.x *= hPadding;
 				v1.y *= vPadding;
 				v1.z = depthDif;
-				Vector3 v2 = corners[i + 3];
+				DPoint3 v2 = corners[i + 3].xyo;
 				v2.x *= hPadding;
 				v2.y *= vPadding;
 				v2.z = depthDif;
@@ -504,6 +518,10 @@ namespace Runevision.LayerProcGen {
 				if (drawProjection)
 					DebugDrawer.DrawLine(FlipYZ(p1 + v1), FlipYZ(p2 + v2), col);
 			}
+		}
+
+		static DPoint3 FlipYZ(DPoint3 v) {
+			return DebugDrawer.xzMode ? new DPoint3(v.x, v.z, v.y) : v;
 		}
 
 		static Vector3 FlipYZ(Vector3 v) {
@@ -516,7 +534,7 @@ namespace Runevision.LayerProcGen {
 			DrawLayerLabels(Camera.main, DrawText);
 		}
 
-		void DrawLayerLabels(Camera cam, Action<LayerLevelVis, Vector3, Color, GUIStyle, Vector2, Vector2> labelMethod) {
+		void DrawLayerLabels(Camera cam, Action<LayerLevelVis, Vector3, Color, GUIStyle, Camera, Vector2, Vector2> labelMethod) {
 			if (cam == null || layerLevels == null)
 				return;
 
@@ -541,30 +559,28 @@ namespace Runevision.LayerProcGen {
 			float planeExtendingRight = Vector3.Cross(depthAxis, right).magnitude;
 			Vector2 screenOffset = Vector2.right * 10f;
 			Vector2 textPivot = new Vector2(0f, 0.5f);
-			
+
 			for (int i = 0; i < layerLevels.Count; i++) {
 				LayerLevelVis vis = layerLevels[i];
 				if (!vis.debugLayerLevel.visible)
 					continue;
-				Vector3 center = vis.center;
-				center.z = vis.depthValue;
-				center = FlipYZ(center);
-				Vector3 size = FlipYZ(vis.size);
+				Vector3 center = vis.centerInScene;
+				Vector3 size = FlipYZ((Vector2)vis.size);
 				Color col = vis.color;
 				col.a = vis.debugLayerLevel.animAlpha * debugLayerLabels.animAlpha * angleAlpha;
 				col.a *= col.a;
 				float sizeAlongRight = Vector3.Scale(right, size).magnitude * 0.5f;
 				float sizeMagnitude = size.magnitude * 0.15f;
-				Vector3 pos = center + right * (sizeAlongRight + sizeMagnitude) * planeExtendingRight;
-				labelMethod(vis, pos, col, labelStyle, screenOffset, textPivot);
+				Vector3 pos = center + right * ((sizeAlongRight + sizeMagnitude) * planeExtendingRight);
+				labelMethod(vis, pos, col, labelStyle, cam, screenOffset, textPivot);
 			}
 		}
 
 		static void DrawText(
-			LayerLevelVis vis, Vector3 worldPos, Color color, GUIStyle labelStyle,
+			LayerLevelVis vis, Vector3 worldPos, Color color, GUIStyle labelStyle, Camera cam,
 			Vector2 screenOffset = default, Vector2 pivot = default
 		) {
-			Vector3 screenPosRaw = Camera.main.WorldToScreenPoint(worldPos);
+			Vector3 screenPosRaw = cam.WorldToScreenPoint(worldPos);
 			if (screenPosRaw.z < 0f)
 				return;
 			Vector2 screenPos = screenPosRaw;
@@ -593,7 +609,7 @@ namespace Runevision.LayerProcGen {
 		}
 
 		static void DrawSceneViewTextMethod(
-			LayerLevelVis vis, Vector3 worldPos, Color color, GUIStyle labelStyle,
+			LayerLevelVis vis, Vector3 worldPos, Color color, GUIStyle labelStyle, Camera cam,
 			Vector2 screenOffset = default, Vector2 pivot = default
 		) {
 			UnityEditor.SceneView view = UnityEditor.SceneView.currentDrawingSceneView;
@@ -619,10 +635,9 @@ namespace Runevision.LayerProcGen {
 			GUI.color = color;
 			Rect position = new Rect(screenPos.x, screenPos.y, size.x, size.y);
 			if (GUI.Button(position, vis.nameContent, labelStyle)) {
-				Vector3 boundsCenter = vis.center;
-				boundsCenter.z = vis.depthValue;
-				Vector3 boundsSize = vis.size;
-				Bounds bounds = new Bounds(FlipYZ(boundsCenter), FlipYZ(boundsSize));
+				Vector3 boundsCenter = vis.centerInScene;
+				Vector3 boundsSize = FlipYZ((Vector2)vis.size);
+				Bounds bounds = new Bounds(boundsCenter, boundsSize);
 				view.Frame(bounds, false);
 			}
 			GUI.color = restoreColor;
