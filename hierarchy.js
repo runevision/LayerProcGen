@@ -2,7 +2,7 @@ var hierarchy =
 [
     [ "AbstractDataLayer", "classRunevision_1_1LayerProcGen_1_1AbstractDataLayer.html", [
       [ "AbstractChunkBasedDataLayer", "classRunevision_1_1LayerProcGen_1_1AbstractChunkBasedDataLayer.html", [
-        [ "ChunkBasedDataLayer< L, C >", "classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer-2-g.html", null ]
+        [ "ChunkBasedDataLayer< L, C >", "classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html", null ]
       ] ]
     ] ],
     [ "CollectionExtensions", "classRunevision_1_1Common_1_1CollectionExtensions.html", null ],
@@ -21,7 +21,7 @@ var hierarchy =
       [ "Point3", "structRunevision_1_1Common_1_1Point3.html", null ]
     ] ],
     [ "IChunkBasedDataLayer", "interfaceRunevision_1_1LayerProcGen_1_1IChunkBasedDataLayer.html", [
-      [ "ChunkBasedDataLayer< L, C >", "classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer-2-g.html", null ]
+      [ "ChunkBasedDataLayer< L, C >", "classRunevision_1_1LayerProcGen_1_1ChunkBasedDataLayer.html", null ]
     ] ],
     [ "IComparable", null, [
       [ "DebugOption", "classRunevision_1_1Common_1_1DebugOption.html", [
@@ -34,7 +34,7 @@ var hierarchy =
       ] ]
     ] ],
     [ "IEnumerable", null, [
-      [ "RollingGrid< T >", "classRunevision_1_1LayerProcGen_1_1RollingGrid-1-g.html", null ]
+      [ "RollingGrid< T >", "classRunevision_1_1LayerProcGen_1_1RollingGrid.html", null ]
     ] ],
     [ "IEquatable", null, [
       [ "DFloat", "structRunevision_1_1Common_1_1DFloat.html", null ],
@@ -48,7 +48,7 @@ var hierarchy =
     [ "ILayerVisualization", "interfaceRunevision_1_1LayerProcGen_1_1ILayerVisualization.html", null ],
     [ "ILC", "interfaceRunevision_1_1LayerProcGen_1_1ILC.html", [
       [ "AbstractLayerChunk", "classRunevision_1_1LayerProcGen_1_1AbstractLayerChunk.html", [
-        [ "LayerChunk< L, C >", "classRunevision_1_1LayerProcGen_1_1LayerChunk-2-g.html", null ]
+        [ "LayerChunk< L, C >", "classRunevision_1_1LayerProcGen_1_1LayerChunk.html", null ]
       ] ]
     ] ],
     [ "IOriginHandler", "interfaceRunevision_1_1Common_1_1IOriginHandler.html", [
@@ -56,17 +56,21 @@ var hierarchy =
       [ "TransformWrapper", "classRunevision_1_1LayerProcGen_1_1TransformWrapper.html", null ]
     ] ],
     [ "IPool", null, [
-      [ "Array2DPool< T >", "classRunevision_1_1Common_1_1Array2DPool-1-g.html", null ]
-    ] ],
-    [ "IPool", null, [
-      [ "Array3DPool< T >", "classRunevision_1_1Common_1_1Array3DPool-1-g.html", null ]
-    ] ],
-    [ "IPool", "interfaceRunevision_1_1Common_1_1IPool.html", [
-      [ "IPool< T >", "interfaceRunevision_1_1Common_1_1IPool-1-g.html", [
-        [ "ArrayPool< T >", "classRunevision_1_1Common_1_1ArrayPool-1-g.html", null ],
-        [ "ListPool< T >", "classRunevision_1_1Common_1_1ListPool-1-g.html", null ],
-        [ "ObjectPool< T >", "classRunevision_1_1Common_1_1ObjectPool-1-g.html", null ]
+      [ "IPool< T >", "interfaceRunevision_1_1Common_1_1IPool.html", [
+        [ "ObjectPool< T >", "classRunevision_1_1Common_1_1ObjectPool.html", null ]
       ] ]
+    ] ],
+    [ "IPool< List< T > >", "interfaceRunevision_1_1Common_1_1IPool.html", [
+      [ "ListPool< T >", "classRunevision_1_1Common_1_1ListPool.html", null ]
+    ] ],
+    [ "IPool< T[,,]>", "interfaceRunevision_1_1Common_1_1IPool.html", [
+      [ "Array3DPool< T >", "classRunevision_1_1Common_1_1Array3DPool.html", null ]
+    ] ],
+    [ "IPool< T[,]>", "interfaceRunevision_1_1Common_1_1IPool.html", [
+      [ "Array2DPool< T >", "classRunevision_1_1Common_1_1Array2DPool.html", null ]
+    ] ],
+    [ "IPool< T[]>", "interfaceRunevision_1_1Common_1_1IPool.html", [
+      [ "ArrayPool< T >", "classRunevision_1_1Common_1_1ArrayPool.html", null ]
     ] ],
     [ "IPoolable", "interfaceRunevision_1_1Common_1_1IPoolable.html", [
       [ "SimpleProfiler.ProfilerInfo", "classRunevision_1_1Common_1_1SimpleProfiler_1_1ProfilerInfo.html", null ],
@@ -82,6 +86,8 @@ var hierarchy =
     [ "LayerManager", "classRunevision_1_1LayerProcGen_1_1LayerManager.html", null ],
     [ "LayerNamedReference", "classRunevision_1_1LayerProcGen_1_1LayerNamedReference.html", null ],
     [ "VisualizationManager.LayerSpec", "classRunevision_1_1LayerProcGen_1_1VisualizationManager_1_1LayerSpec.html", null ],
+    [ "ListPool< ChunkCreationData >", "classRunevision_1_1Common_1_1ListPool.html", null ],
+    [ "ListPool< Point >", "classRunevision_1_1Common_1_1ListPool.html", null ],
     [ "Logg", "classRunevision_1_1Common_1_1Logg.html", null ],
     [ "MainThreadActionQueue", "classRunevision_1_1LayerProcGen_1_1MainThreadActionQueue.html", null ],
     [ "MonoBehaviour", null, [
@@ -104,11 +110,12 @@ var hierarchy =
       [ "PointDrawer", "classRunevision_1_1UnityEditor_1_1PointDrawer.html", null ]
     ] ],
     [ "RandomHash", "structRunevision_1_1Common_1_1RandomHash.html", null ],
+    [ "RollingGrid< C >", "classRunevision_1_1LayerProcGen_1_1RollingGrid.html", null ],
     [ "RunevisionUnityExtensions", "classRunevision_1_1Common_1_1RunevisionUnityExtensions.html", null ],
     [ "SimpleProfiler", "classRunevision_1_1Common_1_1SimpleProfiler.html", null ],
     [ "StateObject", "classRunevision_1_1SaveState_1_1StateObject.html", null ],
-    [ "StateWrapper", "classRunevision_1_1SaveState_1_1StateWrapper.html", [
-      [ "StateWrapper< T >", "classRunevision_1_1SaveState_1_1StateWrapper-1-g.html", null ]
+    [ "StateWrapper", null, [
+      [ "StateWrapper< T >", "classRunevision_1_1SaveState_1_1StateWrapper.html", null ]
     ] ],
     [ "TopLayerDependency", "classRunevision_1_1LayerProcGen_1_1TopLayerDependency.html", null ],
     [ "TypeExtensions", "classRunevision_1_1Common_1_1TypeExtensions.html", null ],

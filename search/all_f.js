@@ -8,6 +8,5 @@ var searchData=
   ['software_20patterns_20for_20layers_5',['Software Patterns for Layers',['../md_Patterns.html',1,'']]],
   ['started_20in_20unity_6',['Getting Started in Unity',['../md_GettingStarted.html',1,'']]],
   ['stateobject_7',['StateObject',['../classRunevision_1_1SaveState_1_1StateObject.html',1,'Runevision::SaveState']]],
-  ['statewrapper_8',['StateWrapper',['../classRunevision_1_1SaveState_1_1StateWrapper.html',1,'Runevision::SaveState']]],
-  ['statewrapper_2d1_2dg_9',['StateWrapper-1-g',['../classRunevision_1_1SaveState_1_1StateWrapper-1-g.html',1,'Runevision::SaveState']]]
+  ['statewrapper_8',['StateWrapper',['../classRunevision_1_1SaveState_1_1StateWrapper.html',1,'Runevision::SaveState']]]
 ];
