@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@v3
         
     - name: Generate Doxygen documentation
-      uses: mattnotmitt/doxygen-action@v1.1.0
+      uses: mattnotmitt/doxygen-action@v1.11.0
       with:
         # Working directory
         working-directory: "Documentation/" # default is .
