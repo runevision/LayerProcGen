@@ -1,0 +1,15 @@
+{
+    "name": "Runevision.Common",
+    "references": [
+        "GUID:bdf51211cba1541cca26870e4d9c763d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
