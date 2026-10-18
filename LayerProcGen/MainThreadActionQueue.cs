@@ -166,7 +166,7 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		/// <remarks>
 		/// If you perform other work on the main thread that you want to make use of the same
-		/// per-frame buget as the main thread action queue actions, you can call Start and Stop
+		/// per-frame budget as the main thread action queue actions, you can call Start and Stop
 		/// on this timer before and after that work is performed, respectively. This will reduce
 		/// the available budget for the queued main thread actions, possibly postponing them to later,
 		/// except for the ones scheduled for next frame.
@@ -179,73 +179,77 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		public static void ProcessQueue() {
 			watch.Start();
-			//UnityEngine.Profiling.Profiler.BeginSample("Next Frame Actions");
-			int queuedCount;
-			lock (s_NextFrame) {
-				queuedCount = s_NextFrame.Count;
-			}
-			while (true) {
-				if (queuedCount == 0)
-					break;
-				IQueuedAction i;
+			try {
+				//UnityEngine.Profiling.Profiler.BeginSample("Next Frame Actions");
+				int queuedCount;
 				lock (s_NextFrame) {
-					// Next Frame actions should be guaranteed to be processed regardless of budget.
-					i = s_NextFrame.Dequeue();
-					queuedCount--;
+					queuedCount = s_NextFrame.Count;
 				}
-				//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
-				i.Process();
-				WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
-				//UnityEngine.Profiling.Profiler.EndSample();
-			}
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Fast Track Actions");
-			while (true) {
-				IQueuedAction i;
-				lock (s_FastTrack) {
-					if (s_FastTrack.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
+				while (true) {
+					if (queuedCount == 0)
 						break;
-					i = s_FastTrack.Dequeue();
-				}
-				//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
-				i.Process();
-				WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
-				//UnityEngine.Profiling.Profiler.EndSample();
-			}
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Queued Routines");
-			while (true) {
-				IEnumerator i;
-				lock (s_RoutineQueue) {
-					if (s_RoutineQueue.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
-						break;
-					i = s_RoutineQueue.Peek();
-				}
-				//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
-				if (!i.MoveNext()) {
-					lock (s_RoutineQueue) {
-						s_RoutineQueue.Dequeue();
+					IQueuedAction i;
+					lock (s_NextFrame) {
+						// Next Frame actions should be guaranteed to be processed regardless of budget.
+						i = s_NextFrame.Dequeue();
+						queuedCount--;
 					}
+					//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
+					i.Process();
 					WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
+					//UnityEngine.Profiling.Profiler.EndSample();
+				}
+				//UnityEngine.Profiling.Profiler.EndSample();
+				//UnityEngine.Profiling.Profiler.BeginSample("Fast Track Actions");
+				while (true) {
+					IQueuedAction i;
+					lock (s_FastTrack) {
+						if (s_FastTrack.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
+							break;
+						i = s_FastTrack.Dequeue();
+					}
+					//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
+					i.Process();
+					WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
+					//UnityEngine.Profiling.Profiler.EndSample();
+				}
+				//UnityEngine.Profiling.Profiler.EndSample();
+				//UnityEngine.Profiling.Profiler.BeginSample("Queued Routines");
+				while (true) {
+					IEnumerator i;
+					lock (s_RoutineQueue) {
+						if (s_RoutineQueue.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
+							break;
+						i = s_RoutineQueue.Peek();
+					}
+					//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
+					if (!i.MoveNext()) {
+						lock (s_RoutineQueue) {
+							s_RoutineQueue.Dequeue();
+						}
+						WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
+					}
+					//UnityEngine.Profiling.Profiler.EndSample();
+				}
+				//UnityEngine.Profiling.Profiler.EndSample();
+				//UnityEngine.Profiling.Profiler.BeginSample("Queued Actions");
+				while (true) {
+					IQueuedAction i;
+					lock (s_Queue) {
+						if (s_Queue.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
+							break;
+						i = s_Queue.Dequeue();
+					}
+					//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
+					i.Process();
+					WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
+					//UnityEngine.Profiling.Profiler.EndSample();
 				}
 				//UnityEngine.Profiling.Profiler.EndSample();
 			}
-			//UnityEngine.Profiling.Profiler.EndSample();
-			//UnityEngine.Profiling.Profiler.BeginSample("Queued Actions");
-			while (true) {
-				IQueuedAction i;
-				lock (s_Queue) {
-					if (s_Queue.Count == 0 || (watch.Elapsed.TotalMilliseconds >= budgetPerFrame))
-						break;
-					i = s_Queue.Dequeue();
-				}
-				//UnityEngine.Profiling.Profiler.BeginSample(i.GetType().Name);
-				i.Process();
-				WorkTracker.AddWorkDone(1, typeof(IQueuedAction));
-				//UnityEngine.Profiling.Profiler.EndSample();
+			finally {
+				watch.Reset();
 			}
-			//UnityEngine.Profiling.Profiler.EndSample();
-			watch.Reset();
 		}
 	}
 

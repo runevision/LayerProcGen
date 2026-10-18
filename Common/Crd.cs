@@ -24,7 +24,7 @@ namespace Runevision.Common {
 		// -9 / 4 = -2 (remainder -1)
 		// Div(-9, 4) = -3 (remainder 3)
 		public static int Div(int x, int divisor) {
-			return (x - (((x % divisor) + divisor) % divisor)) / divisor;
+			return (x - ((divisor - 1) & (x >> 31))) / divisor;
 		}
 
 		public static Point Div(Point p, int divisor) {
@@ -46,7 +46,7 @@ namespace Runevision.Common {
 		// -9 / 4 = -2 (remainder -1)
 		// DivUp(-9, 4) = -2 (remainder -1)
 		public static int DivUp(int x, int divisor) {
-			return (x - (((x % divisor) - divisor) % divisor)) / divisor;
+			return (x + ((divisor - 1) & ~(x >> 31))) / divisor;
 		}
 
 		public static Point DivUp(Point p, int divisor) {
@@ -68,12 +68,14 @@ namespace Runevision.Common {
 		// -9 % 4 = -1
 		// Mod(-9, 4) = 3
 		public static int Mod(int x, int period) {
-			return ((x % period) + period) % period;
+			int r = x % period;
+			return r + (period & (r >> 31));
 		}
 
 		public static DFloat Mod(DFloat x, DFloat period) {
+			int r = x.value % period.value;
 			return new DFloat() {
-				value = ((x.value % period.value) + period.value) % period.value
+				value = r + (period.value & (r >> 31))
 			};
 		}
 

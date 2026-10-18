@@ -32,18 +32,41 @@ namespace Runevision.Common {
 	public interface IOriginHandler {
 		/// <summary>
 		/// An origin handler can either be authoritative or delta-based.
-		///
+		/// </summary>
+		/// <remarks>
 		/// An authoritative handler knows an object's world position in fixed
 		/// point coordinates and calculates a new scene position based on that,
 		/// disregarding the old origin parameter.
+		/// </remarks>
+		/// <example>
+		/// <code>
+		/// DPoint3 worldPosition;
 		///
-		/// A delta-based handler only knows an object's current scene position
-		/// and applies a delta to it which is the new origin minus the old one.
-		///
+		/// public void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin) {
+		/// 	Vector3 scenePosition = (Vector3)(worldPosition - newOrigin);
+		/// 	transform.position = scenePosition;
+		/// }
+		/// </code>
+		/// </example>
+		/// <remarks>
+		/// A delta-based handler only knows an object's current scene position and
+		/// subtracts a delta from it which is the new origin minus the old one.
+		/// </remarks>
+		/// <example>
+		/// <code>
+		/// public void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin) {
+		/// 	if (newOrigin == oldOrigin)
+		/// 		return;
+		/// 	Vector3 delta = (Vector3)(newOrigin - oldOrigin);
+		/// 	transform.position = transform.position - delta;
+		/// }
+		/// </code>
+		/// </example>
+		/// <remarks>
 		/// The two approaches produce almost identical results, but the
 		/// delta-based approach can lead to subtle drifting. This is typically
 		/// not a problem for dynamically moving objects like the player or NPCs.
-		/// </summary>
+		/// </remarks>
 		/// <param name="oldOrigin">The old scene origin in world space.</param>
 		/// <param name="newOrigin">The new scene origin in world space.</param>
 		void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin);
@@ -56,7 +79,7 @@ namespace Runevision.Common {
 	/// <remarks>
 	/// Individual behaviors that control objects' positions need to implement
 	/// the <see cref="IOriginHandler"/> interface and register themselves to
-	/// to the FloatingOrigin, to be invoked when the origin is moved.
+	/// the FloatingOrigin, to be invoked when the origin is moved.
 	/// </remarks>
 	public static class FloatingOrigin {
 

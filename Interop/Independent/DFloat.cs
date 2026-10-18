@@ -22,7 +22,7 @@ namespace Runevision.Common {
 		public DFloat(int value) {
 			#if DEBUG
 			if (value > 8388607 || value < -8388607)
-				throw new OverflowException();
+				throw new OverflowException($"Int {value} is too large to convert to DFloat. The allowed range is +/- 8388606.");
 			#endif
 			this.value = value * Res;
 		}
@@ -30,7 +30,7 @@ namespace Runevision.Common {
 		public DFloat(float value) {
 			#if DEBUG
 			if (value > 8388607 || value < -8388607)
-				throw new OverflowException();
+				throw new OverflowException($"Float {value} is too large to convert to DFloat. The allowed range is +/- 8388606.");
 			#endif
 			this.value = (int)Math.Floor(value * Res);
 		}
@@ -38,7 +38,7 @@ namespace Runevision.Common {
 		public DFloat(double value) {
 			#if DEBUG
 			if (value > 8388607 || value < -8388607)
-				throw new OverflowException();
+				throw new OverflowException($"Double {value} is too large to convert to DFloat. The allowed range is +/- 8388606.");
 			#endif
 			this.value = (int)Math.Floor(value * Res);
 		}
@@ -62,18 +62,18 @@ namespace Runevision.Common {
 		// Private use. Identical method in Crd class can't be used due to
 		// assembly definition dependency directions.
 		static int Div(int x, int divisor) {
-			return (x - (((x % divisor) + divisor) % divisor)) / divisor;
+			return (x - ((divisor - 1) & (x >> 31))) / divisor;
 		}
 
 		// Private use. Identical method in Crd class can't be used due to
 		// assembly definition dependency directions.
 		static int DivUp(int x, int divisor) {
-			return (x - (((x % divisor) - divisor) % divisor)) / divisor;
+			return (x + ((divisor - 1) & ~(x >> 31))) / divisor;
 		}
 
 		// Private use.
 		static long Div(long x, long divisor) {
-			return (x - (((x % divisor) + divisor) % divisor)) / divisor;
+			return (x - ((divisor - 1) & (x >> 63))) / divisor;
 		}
 
 		public static explicit operator int(DFloat f) {
@@ -182,6 +182,10 @@ namespace Runevision.Common {
 
 		public static DFloat Max(DFloat a, DFloat b) {
 			return new DFloat { value = Math.Max(a.value, b.value) };
+		}
+
+		public static DFloat Average(DFloat a, DFloat b) {
+			return a + (b - a) / 2;
 		}
 
 		public static DFloat Clamp(DFloat val, DFloat min, DFloat max) {

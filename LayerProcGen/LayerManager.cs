@@ -90,15 +90,25 @@ namespace Runevision.LayerProcGen {
 		}
 
 		void LayerUpdateThread() {
+			List<TopLayerDependency> topDependenciesCopy = new List<TopLayerDependency>();
 			while (!aborting) {
 				bool changed = false;
+
+				// Use a copy of topDependencies so we don't need to
+				// lock the original for an extended duration.
+				// topDependencies is being accessed (with lock) from
+				// the main thread, so locking it here for multiple frames
+				// can cause hiccups or deadlocks.
+				topDependenciesCopy.Clear();
 				lock (topDependencies) {
-					for (int i = 0; i < topDependencies.Count; i++) {
-						TopLayerDependency dep = topDependencies[i];
-						if (dep.changed) { // TODO: Occasional nullref here?
-							WorkTracker.AddWorkEstimated(100, dep.layer.GetType());
-							changed = true;
-						}
+					topDependenciesCopy.AddRange(topDependencies);
+				}
+
+				for (int i = 0; i < topDependenciesCopy.Count; i++) {
+					TopLayerDependency dep = topDependenciesCopy[i];
+					if (dep.changed) {
+						WorkTracker.AddWorkEstimated(100, dep.layer.GetType());
+						changed = true;
 					}
 				}
 
@@ -106,26 +116,25 @@ namespace Runevision.LayerProcGen {
 					var ph = SimpleProfiler.Begin("LayerManager Process", 1);
 
 					isGeneratingInBackground = true;
-					lock (topDependencies) {
-						// Process updated active top dependencies, including new ones.
-						for (int i = 0; i < topDependencies.Count; i++) {
-							TopLayerDependency dep = topDependencies[i];
-							if (dep.changed && dep.isActive) {
-								dep.abstractLayer.ProcessTopDependency(dep);
-								WorkTracker.WorkIsKnown(dep.layer.GetType());
-							}
+
+					// Process updated active top dependencies, including new ones.
+					for (int i = 0; i < topDependenciesCopy.Count; i++) {
+						TopLayerDependency dep = topDependenciesCopy[i];
+						if (dep.changed && dep.isActive) {
+							dep.abstractLayer.ProcessTopDependency(dep);
+							WorkTracker.WorkIsKnown(dep.layer.GetType());
 						}
-						// Process and remove inactive top dependencies.
-						// We do this afterwards to avoid a chunk being briefly removed
-						// in cases where one top layer dependency was removed but another
-						// which depends on the same chunk was added at the same time.
-						for (int i = 0; i < topDependencies.Count; i++) {
-							TopLayerDependency dep = topDependencies[i];
-							if (!dep.isActive) {
-								dep.abstractLayer.ProcessTopDependency(dep);
-								WorkTracker.WorkIsKnown(dep.layer.GetType());
-								RemoveTopDependency(dep);
-							}
+					}
+					// Process and remove inactive top dependencies.
+					// We do this afterwards to avoid a chunk being briefly removed
+					// in cases where one top layer dependency was removed but another
+					// which depends on the same chunk was added at the same time.
+					for (int i = 0; i < topDependenciesCopy.Count; i++) {
+						TopLayerDependency dep = topDependenciesCopy[i];
+						if (!dep.isActive) {
+							dep.abstractLayer.ProcessTopDependency(dep);
+							WorkTracker.WorkIsKnown(dep.layer.GetType());
+							RemoveTopDependency(dep);
 						}
 					}
 

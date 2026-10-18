@@ -19,7 +19,7 @@ namespace Runevision.Common {
 	/// Vector2 parameters draw in either the XY or XZ plane depending on whether
 	/// the xzMode property is set to true.
 	/// </remarks>
-	public class DebugDrawer : MonoBehaviour {
+	public class DebugDrawer : MonoBehaviour, IOriginHandler {
 		struct Line {
 			public Vector3 start;
 			public Vector3 end;
@@ -82,6 +82,14 @@ namespace Runevision.Common {
 			colorSpace = QualitySettings.activeColorSpace;
 		}
 
+		void OnEnable() {
+			FloatingOrigin.RegisterHandler(this);
+		}
+
+		void OnDisable() {
+			FloatingOrigin.UnregisterHandler(this);
+		}
+
 		void SetMaterial() {
 			s_MatZOn = new Material(shaderZOn);
 			s_MatZOn.hideFlags = HideFlags.HideAndDontSave;
@@ -131,6 +139,26 @@ namespace Runevision.Common {
 			lock (lines) {
 				for (int i = lines.Count - 1; i >= 0; i--)
 					lines[i].Draw();
+			}
+		}
+
+		public void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin) {
+			// We move lines by offset rather than based on authoritative
+			// DPoint3 points, in order to not have to cast every frame,
+			// or alternatively store two versions of positions.
+			Vector3 offset = -(Vector3)(newOrigin - oldOrigin);
+			MoveList(linesZOnMultiFrame, offset);
+			MoveList(linesZOffMultiFrame, offset);
+		}
+
+		void MoveList(List<Line> lines, Vector3 offset) {
+			lock (lines) {
+				for (int i = lines.Count - 1; i >= 0; i--) {
+					Line line = lines[i];
+					line.start += offset;
+					line.end += offset;
+					lines[i] = line;
+				}
 			}
 		}
 
@@ -227,55 +255,55 @@ namespace Runevision.Common {
 			DrawRect(new DPoint(xMin, yMin), new DPoint(xMax, yMax), 0, color);
 		}
 
-		public static void DrawRect(Vector2 min, Vector2 max, float depth, Color color) {
+		public static void DrawRect(Vector2 min, Vector2 max, float depth, Color color, float duration = 0, bool depthTest = false) {
 			if (xzMode) {
 				DrawLine(
 					new Vector3(min.x, depth, min.y),
 					new Vector3(min.x, depth, max.y),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(max.x, depth, min.y),
 					new Vector3(max.x, depth, max.y),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(min.x, depth, min.y),
 					new Vector3(max.x, depth, min.y),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(min.x, depth, max.y),
 					new Vector3(max.x, depth, max.y),
-					color
+					color, duration, depthTest
 				);
 			}
 			else {
 				DrawLine(
 					new Vector3(min.x, min.y, depth),
 					new Vector3(min.x, max.y, depth),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(max.x, min.y, depth),
 					new Vector3(max.x, max.y, depth),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(min.x, min.y, depth),
 					new Vector3(max.x, min.y, depth),
-					color
+					color, duration, depthTest
 				);
 				DrawLine(
 					new Vector3(min.x, max.y, depth),
 					new Vector3(max.x, max.y, depth),
-					color
+					color, duration, depthTest
 				);
 			}
 		}
 
-		public static void DrawRect(DPoint min, DPoint max, DFloat depth, Color color) {
-			DrawRect(Scene(min), Scene(max), (float)depth, color);
+		public static void DrawRect(DPoint min, DPoint max, DFloat depth, Color color, float duration = 0, bool depthTest = false) {
+			DrawRect(Scene(min), Scene(max), (float)depth, color, duration, depthTest);
 		}
 
 		static Vector3 Mode(Vector2 pos) {

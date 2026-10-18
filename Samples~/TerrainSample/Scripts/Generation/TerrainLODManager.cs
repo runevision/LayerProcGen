@@ -50,12 +50,14 @@ public class TerrainLODManager : MonoBehaviour {
 		}
 	}
 
+	HashSet<Point> lowestLevelChunks = new HashSet<Point>();
+
 	void LateUpdate() {
 		if (anyRegistrationChanges) {
 			anyRegistrationChanges = false;
 
-			// Find bounds of current terrain chunks in all layers.
-			GridBounds lowestLayerBounds = GridBounds.Empty();
+			// Find indices of current lowest level (largest) terrain chunks.
+			lowestLevelChunks.Clear();
 			int divisor = 1;
 			for (int i = layers.Length - 1; i >= 0; i--) {
 				foreach (var kvp in layers[i].chunks) {
@@ -63,19 +65,16 @@ public class TerrainLODManager : MonoBehaviour {
 						Crd.Div(kvp.Key.x, divisor),
 						Crd.Div(kvp.Key.y, divisor)
 					);
-					lowestLayerBounds.Encapsulate(index);
+					lowestLevelChunks.Add(index);
 				}
 				divisor *= 2;
 			}
-			lastLowerLevelBounds = lowestLayerBounds;
 
 			// Activate and deactivate terrain chunks.
 			UnityEngine.Profiling.Profiler.BeginSample("HandleActivations");
 			int level = layers.Length - 1;
-			for (int x = lowestLayerBounds.min.x; x < lowestLayerBounds.max.x; x++) {
-				for (int y = lowestLayerBounds.min.y; y < lowestLayerBounds.max.y; y++) {
-					HandleAreaIfCovered(level, new Point(x, y));
-				}
+			foreach (Point p in lowestLevelChunks) {
+				HandleAreaIfCovered(level, p);
 			}
 			UnityEngine.Profiling.Profiler.EndSample();
 		}
@@ -83,15 +82,6 @@ public class TerrainLODManager : MonoBehaviour {
 		// Debug draw.
 		if (debugLODBounds.visible) {
 			DebugDrawer.alpha = debugLODBounds.animAlpha;
-			var lowestLayer = layers[layers.Length - 1].layer;
-			VisualizationManager.BeginDebugDraw(lowestLayer, 0);
-			DebugDrawer.DrawRect(
-				lastLowerLevelBounds.min * lowestLayer.chunkW,
-				lastLowerLevelBounds.max * lowestLayer.chunkW,
-				0,
-				Color.yellow);
-			VisualizationManager.EndDebugDraw();
-
 			for (int i = 0; i < layers.Length; i++) {
 				VisualizationManager.BeginDebugDraw(layers[i].layer, 0);
 				foreach (var kvp in layers[i].chunks) {

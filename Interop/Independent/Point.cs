@@ -140,6 +140,10 @@ namespace Runevision.Common {
 			return new Point(Math.Max(a.x, b.x), Math.Max(a.y, b.y));
 		}
 
+		public static Point Average(Point a, Point b) {
+			return a + (b - a) / 2;
+		}
+
 		public int sqrMagnitude {
 			get {
 				return x * x + y * y;

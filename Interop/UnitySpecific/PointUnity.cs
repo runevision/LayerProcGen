@@ -41,6 +41,16 @@ namespace Runevision.Common {
 		}
 
 #if PACKAGE_UNITY_MATHEMATICS
+		// User-defined conversion from Point to int2
+		public static implicit operator int2(Point p) {
+			return new int2(p.x, p.y);
+		}
+
+		// User-defined conversion from int2 to Point
+		public static implicit operator Point(int2 p) {
+			return new Point(p.x, p.y);
+		}
+
 		// User-defined conversion from Point to float3
 		public static explicit operator float3(Point p) {
 			return new float3(p.x, p.y, 0);

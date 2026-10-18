@@ -27,6 +27,16 @@ namespace Runevision.Common {
 		}
 
 #if PACKAGE_UNITY_MATHEMATICS
+		// User-defined conversion from Point3 to int3
+		public static implicit operator int3(Point3 p) {
+			return new int3(p.x, p.y, p.z);
+		}
+
+		// User-defined conversion from int3 to Point3
+		public static implicit operator Point3(int3 p) {
+			return new Point3(p.x, p.y, p.z);
+		}
+
 		// User-defined conversion from Point to float3
 		public static explicit operator float3(Point3 p) {
 			return new float3(p.x, p.y, p.z);
