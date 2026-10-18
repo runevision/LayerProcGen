@@ -67,6 +67,10 @@ namespace Runevision.Common {
 			return new Point3(a.x * f, a.y * f, a.z * f);
 		}
 
+		public static Point3 operator /(Point3 a, int f) {
+			return new Point3(a.x / f, a.y / f, a.z / f);
+		}
+
 		public static Point3 operator *(Point3 a, Point3 b) {
 			return new Point3(a.x * b.x, a.y * b.y, a.z * b.z);
 		}
@@ -132,6 +136,10 @@ namespace Runevision.Common {
 
 		public static Point3 Max(Point3 a, Point3 b) {
 			return new Point3(Math.Max(a.x, b.x), Math.Max(a.y, b.y), Math.Max(a.z, b.z));
+		}
+
+		public static Point3 Average(Point3 a, Point3 b) {
+			return a + (b - a) / 2;
 		}
 
 		public int sqrMagnitude {

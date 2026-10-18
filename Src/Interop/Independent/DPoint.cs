@@ -137,6 +137,10 @@ namespace Runevision.Common {
 			return new DPoint(DFloat.Max(a.x, b.x), DFloat.Max(a.y, b.y));
 		}
 
+		public static DPoint Average(DPoint a, DPoint b) {
+			return a + (b - a) / 2;
+		}
+
 		public DFloat sqrMagnitude {
 			get {
 				return x * x + y * y;

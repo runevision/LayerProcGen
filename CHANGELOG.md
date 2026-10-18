@@ -1,6 +1,30 @@
 # Changelog
 
 
+## 0.5.0 - 2026-10-18
+
+### Added
+
+- Added average function for all point types.
+- Added missing Point3 division by int operator.
+- Support duration and depth test for DebugDrawer.DrawRect function.
+- Added implicit conversions Point <> int2 and Point3 <> int3.
+- Support getting the origin at edit time from the FloatingOriginSetter component.
+
+### Changed
+
+- Set generation threads to lowest priority to not interfere with time sensitive frame jobs.
+- Made FloatingOriginSetter simpler and more fool proof by always handling own shift if necessary.
+- Optimized Mod and Div operations in Crd class.
+- Log values that cause OverflowExceptions in DFloat constructors.
+- Wrap MainThreadActionQueue execution in try-finally to ensure the timer watch gets reset.
+
+### Fixed
+
+- Fixed DebugDrawer not handle floating origin right for persistent lines.
+- Operate on a copy of topDependencies in LayerUpdateThread to avoid deadlocks.
+
+
 ## 0.4.0 - 2026-06-18
 
 ### Added

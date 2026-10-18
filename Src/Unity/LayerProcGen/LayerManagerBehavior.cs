@@ -22,7 +22,13 @@ namespace Runevision.LayerProcGen {
 
 		public enum GenerationPlane { XY, XZ }
 
-		public static LayerManagerBehavior instance { get; private set; }
+		static LayerManagerBehavior m_Instance;
+		public static LayerManagerBehavior instance { get {
+			if (!m_Instance) {
+				m_Instance = FindObjectOfType<LayerManagerBehavior>();
+			}
+			return m_Instance;
+		}}
 
 		public static event Action OnUpdate;
 
@@ -37,7 +43,7 @@ namespace Runevision.LayerProcGen {
 
 		void Awake() {
 			manager = new LayerManager(useParallelThreads);
-			instance = this;
+			m_Instance = this;
 		}
 
 		void OnDestroy() {

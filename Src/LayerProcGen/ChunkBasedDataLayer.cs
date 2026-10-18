@@ -10,6 +10,7 @@ using Runevision.Common;
 using Runevision.SaveState;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Runevision.LayerProcGen {
@@ -134,6 +135,7 @@ namespace Runevision.LayerProcGen {
 		/// </summary>
 		/// <param name="index">An integer coordinate that indexes into the grid of chunks.</param>
 		/// <param name="chunk">The requested chunk, or null.</param>
+		/// <param name="level">The required level of the chunk.</param>
 		/// <returns>True if the chunk exists and has been generated to at least level 0.</returns>
 		protected bool TryGetChunk(Point index, out C chunk, int level = 0) {
 			chunk = chunks[index];
@@ -248,13 +250,25 @@ namespace Runevision.LayerProcGen {
 				return;
 			C chunk = chunkCreationData.chunk;
 			int level = chunkCreationData.level;
+
+			var previousPriority = Thread.CurrentThread.Priority;
+			// Set lowest priority to not interfere with time sensitive frame jobs.
+			Thread.CurrentThread.Priority = ThreadPriority.Lowest;
+
 			SimpleProfiler.BeginThread("Gen", $"{GetType().Name} {level} {chunk.index}");
-			lock (chunk.levelLocks[level]) {
-				if (chunk.level < level)
-					CreateAndRegisterChunk(chunk, level);
-				WorkTracker.AddWorkDone(1, GetType());
+			try {
+				lock (chunk.levelLocks[level]) {
+					if (chunk.level < level)
+						CreateAndRegisterChunk(chunk, level);
+					WorkTracker.AddWorkDone(1, GetType());
+				}
 			}
-			SimpleProfiler.EndThread();
+			finally {
+				SimpleProfiler.EndThread();
+
+				// Reset to previous priority of the Task Parallel Library thread.
+				Thread.CurrentThread.Priority = previousPriority;
+			}
 		}
 
 		static ListPool<ChunkCreationData> createChunksListPool = new ListPool<ChunkCreationData>(128);
