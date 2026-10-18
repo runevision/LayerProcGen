@@ -30,7 +30,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="LayerProcGenLogoSmall.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.4.0</span>
+   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.5.0</span>
    </div>
    <div id="projectbrief">Layer-based infinite procedural generation</div>
   </td>
@@ -101,8 +101,8 @@ $(function(){initNavTree('classRunevision_1_1LayerProcGen_1_1FloatingOriginSette
 
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#properties">Properties</a> &#124;
 <a href="classRunevision_1_1LayerProcGen_1_1FloatingOriginSetter-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FloatingOriginSetter</div></div>
 </div><!--header-->
@@ -111,58 +111,29 @@ $(function(){initNavTree('classRunevision_1_1LayerProcGen_1_1FloatingOriginSette
 <p>Unity component that can move the FloatingOrigin based on the given transform position.  
  <a href="#details">More...</a></p>
 
-<p>Inherits MonoBehaviour, and <a class="el" href="interfaceRunevision_1_1Common_1_1IOriginHandler.html">IOriginHandler</a>.</p>
+<p>Inherits MonoBehaviour.</p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a77c3793ef00e17d0029e193cbd6db17b" id="r_a77c3793ef00e17d0029e193cbd6db17b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a> (<a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin)</td></tr>
-<tr class="memdesc:a77c3793ef00e17d0029e193cbd6db17b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of the IOriginHandler interface. Not to be called directly.  <br /></td></tr>
-<tr class="separator:a77c3793ef00e17d0029e193cbd6db17b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a7defd1af40a760ce5640ddb4b85e148c" id="r_a7defd1af40a760ce5640ddb4b85e148c"><td class="memItemLeft" align="right" valign="top"><a id="a7defd1af40a760ce5640ddb4b85e148c" name="a7defd1af40a760ce5640ddb4b85e148c"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>incrementDist</b> = 1000</td></tr>
 <tr class="memdesc:a7defd1af40a760ce5640ddb4b85e148c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The origin is shifted if the transform position is further than this distance from the current origin (along the cardinal directions in the generation plane). <br /></td></tr>
 <tr class="separator:a7defd1af40a760ce5640ddb4b85e148c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a187f289b44d316e7b0bac2597e248ac6" id="r_a187f289b44d316e7b0bac2597e248ac6"><td class="memItemLeft" align="right" valign="top"><a id="a187f289b44d316e7b0bac2597e248ac6" name="a187f289b44d316e7b0bac2597e248ac6"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>moveSelf</b></td></tr>
-<tr class="memdesc:a187f289b44d316e7b0bac2597e248ac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the component should move its GameObject's transform when the origin shifts. This should be enabled if and only if no other component performs this job. <br /></td></tr>
-<tr class="separator:a187f289b44d316e7b0bac2597e248ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a903d0d8820c696aaa1170c50deb3633f" id="r_a903d0d8820c696aaa1170c50deb3633f"><td class="memItemLeft" align="right" valign="top"><a id="a903d0d8820c696aaa1170c50deb3633f" name="a903d0d8820c696aaa1170c50deb3633f"></a>
 <a class="el" href="structRunevision_1_1Common_1_1Point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>origin</b></td></tr>
 <tr class="memdesc:a903d0d8820c696aaa1170c50deb3633f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current origin as a 2D point in the generation plane. <br /></td></tr>
 <tr class="separator:a903d0d8820c696aaa1170c50deb3633f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+Properties</h2></td></tr>
+<tr class="memitem:a8915e7f78f3d5617ebda7ffbf599ab2d" id="r_a8915e7f78f3d5617ebda7ffbf599ab2d"><td class="memItemLeft" align="right" valign="top"><a id="a8915e7f78f3d5617ebda7ffbf599ab2d" name="a8915e7f78f3d5617ebda7ffbf599ab2d"></a>
+<a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a>&#160;</td><td class="memItemRight" valign="bottom"><b>originAs3D</b><code> [get]</code></td></tr>
+<tr class="memdesc:a8915e7f78f3d5617ebda7ffbf599ab2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The origin as a 3D position where one axis is zero. This function depends on a <a class="el" href="classRunevision_1_1LayerProcGen_1_1LayerManagerBehavior.html" title="Unity component that wraps the LayerManager class.">LayerManagerBehavior</a> being present in the scene to determine whether generation happens in the XY or XZ plane. <br /></td></tr>
+<tr class="separator:a8915e7f78f3d5617ebda7ffbf599ab2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Unity component that can move the FloatingOrigin based on the given transform position. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a77c3793ef00e17d0029e193cbd6db17b" name="a77c3793ef00e17d0029e193cbd6db17b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77c3793ef00e17d0029e193cbd6db17b">&#9670;&#160;</a></span>HandleOriginShift()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void HandleOriginShift </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a></td>          <td class="paramname"><span class="paramname"><em>oldOrigin</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a></td>          <td class="paramname"><span class="paramname"><em>newOrigin</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implementation of the IOriginHandler interface. Not to be called directly. </p>
-
-<p>Implements <a class="el" href="interfaceRunevision_1_1Common_1_1IOriginHandler.html#a77c3793ef00e17d0029e193cbd6db17b">IOriginHandler</a>.</p>
-
-</div>
-</div>
-</div><!-- contents -->
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

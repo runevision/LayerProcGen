@@ -30,7 +30,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="LayerProcGenLogoSmall.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.4.0</span>
+   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.5.0</span>
    </div>
    <div id="projectbrief">Layer-based infinite procedural generation</div>
   </td>
@@ -101,6 +101,7 @@ $(function(){initNavTree('classRunevision_1_1Common_1_1DebugDrawer.html',''); in
 
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
@@ -112,8 +113,14 @@ $(function(){initNavTree('classRunevision_1_1Common_1_1DebugDrawer.html',''); in
 <p>A utility for drawing lines for debug visualizations.  
  <a href="#details">More...</a></p>
 
-<p>Inherits MonoBehaviour.</p>
+<p>Inherits MonoBehaviour, and <a class="el" href="interfaceRunevision_1_1Common_1_1IOriginHandler.html">IOriginHandler</a>.</p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a77c3793ef00e17d0029e193cbd6db17b" id="r_a77c3793ef00e17d0029e193cbd6db17b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a> (<a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin)</td></tr>
+<tr class="memdesc:a77c3793ef00e17d0029e193cbd6db17b"><td class="mdescLeft">&#160;</td><td class="mdescRight">An origin handler can either be authoritative or delta-based.  <br /></td></tr>
+<tr class="separator:a77c3793ef00e17d0029e193cbd6db17b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a848199d03769400338f9b424c76c27bd" id="r_a848199d03769400338f9b424c76c27bd"><td class="memItemLeft" align="right" valign="top"><a id="a848199d03769400338f9b424c76c27bd" name="a848199d03769400338f9b424c76c27bd"></a>
@@ -194,15 +201,15 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRay</b> (V
 <tr class="memitem:a1da38159e4e809d6c9df287b0fbff594" id="r_a1da38159e4e809d6c9df287b0fbff594"><td class="memItemLeft" align="right" valign="top"><a id="a1da38159e4e809d6c9df287b0fbff594" name="a1da38159e4e809d6c9df287b0fbff594"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (<a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> xMin, <a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> yMin, <a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> xMax, <a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> yMax, Color color)</td></tr>
 <tr class="separator:a1da38159e4e809d6c9df287b0fbff594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a950fb39814bac2291f4a510a2dcfbae0" id="r_a950fb39814bac2291f4a510a2dcfbae0"><td class="memItemLeft" align="right" valign="top"><a id="a950fb39814bac2291f4a510a2dcfbae0" name="a950fb39814bac2291f4a510a2dcfbae0"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (<a class="el" href="structRunevision_1_1Common_1_1DPoint.html">DPoint</a> min, <a class="el" href="structRunevision_1_1Common_1_1DPoint.html">DPoint</a> max, <a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> depth, Color color)</td></tr>
-<tr class="separator:a950fb39814bac2291f4a510a2dcfbae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa60c0666c4ba84d4ed4c1cc84f2d059" id="r_aaa60c0666c4ba84d4ed4c1cc84f2d059"><td class="memItemLeft" align="right" valign="top"><a id="aaa60c0666c4ba84d4ed4c1cc84f2d059" name="aaa60c0666c4ba84d4ed4c1cc84f2d059"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (<a class="el" href="structRunevision_1_1Common_1_1DPoint.html">DPoint</a> min, <a class="el" href="structRunevision_1_1Common_1_1DPoint.html">DPoint</a> max, <a class="el" href="structRunevision_1_1Common_1_1DFloat.html">DFloat</a> depth, Color color, float duration=0, bool depthTest=false)</td></tr>
+<tr class="separator:aaa60c0666c4ba84d4ed4c1cc84f2d059"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57e72130e8d6589a78bc57434c657ce1" id="r_a57e72130e8d6589a78bc57434c657ce1"><td class="memItemLeft" align="right" valign="top"><a id="a57e72130e8d6589a78bc57434c657ce1" name="a57e72130e8d6589a78bc57434c657ce1"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (float xMin, float yMin, float xMax, float yMax, Color color)</td></tr>
 <tr class="separator:a57e72130e8d6589a78bc57434c657ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab073b53ab86cabaa857c9f030543dde5" id="r_ab073b53ab86cabaa857c9f030543dde5"><td class="memItemLeft" align="right" valign="top"><a id="ab073b53ab86cabaa857c9f030543dde5" name="ab073b53ab86cabaa857c9f030543dde5"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (Vector2 min, Vector2 max, float depth, Color color)</td></tr>
-<tr class="separator:ab073b53ab86cabaa857c9f030543dde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5280b5742d1fc8a9aec42c03a43ebc72" id="r_a5280b5742d1fc8a9aec42c03a43ebc72"><td class="memItemLeft" align="right" valign="top"><a id="a5280b5742d1fc8a9aec42c03a43ebc72" name="a5280b5742d1fc8a9aec42c03a43ebc72"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRect</b> (Vector2 min, Vector2 max, float depth, Color color, float duration=0, bool depthTest=false)</td></tr>
+<tr class="separator:a5280b5742d1fc8a9aec42c03a43ebc72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ac4a0b88ee65b96700630256b6b2cb4" id="r_a2ac4a0b88ee65b96700630256b6b2cb4"><td class="memItemLeft" align="right" valign="top"><a id="a2ac4a0b88ee65b96700630256b6b2cb4" name="a2ac4a0b88ee65b96700630256b6b2cb4"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSquare</b> (<a class="el" href="structRunevision_1_1Common_1_1DPoint3.html">DPoint3</a> pos, Vector3 scale, Color color, Vector3? rot=null, float duration=0, bool depthTest=false)</td></tr>
 <tr class="separator:a2ac4a0b88ee65b96700630256b6b2cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,7 +250,58 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>xzMode</b> = f
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A utility for drawing lines for debug visualizations. </p>
 <p>Functions that take Vector3 parameters draw in 3D space. Functions that take Vector2 parameters draw in either the XY or XZ plane depending on whether the xzMode property is set to true. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a77c3793ef00e17d0029e193cbd6db17b" name="a77c3793ef00e17d0029e193cbd6db17b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77c3793ef00e17d0029e193cbd6db17b">&#9670;&#160;</a></span>HandleOriginShift()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HandleOriginShift </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a></td>          <td class="paramname"><span class="paramname"><em>oldOrigin</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structRunevision_1_1Common_1_1Point3.html">Point3</a></td>          <td class="paramname"><span class="paramname"><em>newOrigin</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>An origin handler can either be authoritative or delta-based. </p>
+<p>An authoritative handler knows an object's world position in fixed point coordinates and calculates a new scene position based on that, disregarding the old origin parameter. </p>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRunevision_1_1Common_1_1DPoint3.html">DPoint3</a> worldPosition;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a>(<a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin) {</div>
+<div class="line">    Vector3 scenePosition = (Vector3)(worldPosition - newOrigin);</div>
+<div class="line">    transform.position = scenePosition;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassRunevision_1_1Common_1_1DebugDrawer_html_a77c3793ef00e17d0029e193cbd6db17b"><div class="ttname"><a href="#a77c3793ef00e17d0029e193cbd6db17b">Runevision.Common.DebugDrawer.HandleOriginShift</a></div><div class="ttdeci">void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin)</div><div class="ttdoc">An origin handler can either be authoritative or delta-based.</div><div class="ttdef"><b>Definition</b> DebugDrawer.cs:145</div></div>
+<div class="ttc" id="astructRunevision_1_1Common_1_1DPoint3_html"><div class="ttname"><a href="structRunevision_1_1Common_1_1DPoint3.html">Runevision.Common.DPoint3</a></div><div class="ttdef"><b>Definition</b> DPoint3.cs:14</div></div>
+<div class="ttc" id="astructRunevision_1_1Common_1_1Point3_html"><div class="ttname"><a href="structRunevision_1_1Common_1_1Point3.html">Runevision.Common.Point3</a></div><div class="ttdef"><b>Definition</b> Point3.cs:15</div></div>
+</div><!-- fragment --> <p>A delta-based handler only knows an object's current scene position and subtracts a delta from it which is the new origin minus the old one. </p>
+<div class="fragment"><div class="line"><span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a>(<a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin) {</div>
+<div class="line">    <span class="keywordflow">if</span> (newOrigin == oldOrigin)</div>
+<div class="line">        <span class="keywordflow">return</span>;</div>
+<div class="line">    Vector3 delta = (Vector3)(newOrigin - oldOrigin);</div>
+<div class="line">    transform.position = transform.position - delta;</div>
+<div class="line">}</div>
+</div><!-- fragment --> <p>The two approaches produce almost identical results, but the delta-based approach can lead to subtle drifting. This is typically not a problem for dynamically moving objects like the player or NPCs. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">oldOrigin</td><td>The old scene origin in world space.</td></tr>
+    <tr><td class="paramname">newOrigin</td><td>The new scene origin in world space.</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="interfaceRunevision_1_1Common_1_1IOriginHandler.html#a77c3793ef00e17d0029e193cbd6db17b">IOriginHandler</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

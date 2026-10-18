@@ -30,7 +30,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="LayerProcGenLogoSmall.png"/></td>
   <td id="projectalign">
-   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.4.0</span>
+   <div id="projectname">LayerProcGen<span id="projectnumber">&#160;v0.5.0</span>
    </div>
    <div id="projectbrief">Layer-based infinite procedural generation</div>
   </td>
@@ -159,9 +159,24 @@ Transform&#160;</td><td class="memItemRight" valign="bottom"><b>transform</b><co
 </div><div class="memdoc">
 
 <p>An origin handler can either be authoritative or delta-based. </p>
-<p>An authoritative handler knows an object's world position in fixed point coordinates and calculates a new scene position based on that, disregarding the old origin parameter.</p>
-<p>A delta-based handler only knows an object's current scene position and applies a delta to it which is the new origin minus the old one.</p>
-<p>The two approaches produce almost identical results, but the delta-based approach can lead to subtle drifting. This is typically not a problem for dynamically moving objects like the player or NPCs.</p>
+<p>An authoritative handler knows an object's world position in fixed point coordinates and calculates a new scene position based on that, disregarding the old origin parameter. </p>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRunevision_1_1Common_1_1DPoint3.html">DPoint3</a> worldPosition;</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a>(<a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin) {</div>
+<div class="line">    Vector3 scenePosition = (Vector3)(worldPosition - newOrigin);</div>
+<div class="line">    transform.position = scenePosition;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassRunevision_1_1LayerProcGen_1_1TransformWrapper_html_a77c3793ef00e17d0029e193cbd6db17b"><div class="ttname"><a href="#a77c3793ef00e17d0029e193cbd6db17b">Runevision.LayerProcGen.TransformWrapper.HandleOriginShift</a></div><div class="ttdeci">void HandleOriginShift(Point3 oldOrigin, Point3 newOrigin)</div><div class="ttdoc">An origin handler can either be authoritative or delta-based.</div><div class="ttdef"><b>Definition</b> TransformWrapper.cs:61</div></div>
+<div class="ttc" id="astructRunevision_1_1Common_1_1DPoint3_html"><div class="ttname"><a href="structRunevision_1_1Common_1_1DPoint3.html">Runevision.Common.DPoint3</a></div><div class="ttdef"><b>Definition</b> DPoint3.cs:14</div></div>
+<div class="ttc" id="astructRunevision_1_1Common_1_1Point3_html"><div class="ttname"><a href="structRunevision_1_1Common_1_1Point3.html">Runevision.Common.Point3</a></div><div class="ttdef"><b>Definition</b> Point3.cs:15</div></div>
+</div><!-- fragment --> <p>A delta-based handler only knows an object's current scene position and subtracts a delta from it which is the new origin minus the old one. </p>
+<div class="fragment"><div class="line"><span class="keyword">public</span> <span class="keywordtype">void</span> <a class="code hl_function" href="#a77c3793ef00e17d0029e193cbd6db17b">HandleOriginShift</a>(<a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> oldOrigin, <a class="code hl_struct" href="structRunevision_1_1Common_1_1Point3.html">Point3</a> newOrigin) {</div>
+<div class="line">    <span class="keywordflow">if</span> (newOrigin == oldOrigin)</div>
+<div class="line">        <span class="keywordflow">return</span>;</div>
+<div class="line">    Vector3 delta = (Vector3)(newOrigin - oldOrigin);</div>
+<div class="line">    transform.position = transform.position - delta;</div>
+<div class="line">}</div>
+</div><!-- fragment --> <p>The two approaches produce almost identical results, but the delta-based approach can lead to subtle drifting. This is typically not a problem for dynamically moving objects like the player or NPCs. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">oldOrigin</td><td>The old scene origin in world space.</td></tr>

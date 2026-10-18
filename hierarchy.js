@@ -52,7 +52,7 @@ var hierarchy =
       ] ]
     ] ],
     [ "IOriginHandler", "interfaceRunevision_1_1Common_1_1IOriginHandler.html", [
-      [ "FloatingOriginSetter", "classRunevision_1_1LayerProcGen_1_1FloatingOriginSetter.html", null ],
+      [ "DebugDrawer", "classRunevision_1_1Common_1_1DebugDrawer.html", null ],
       [ "TransformWrapper", "classRunevision_1_1LayerProcGen_1_1TransformWrapper.html", null ]
     ] ],
     [ "IPool", null, [

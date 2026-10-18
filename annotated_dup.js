@@ -8,7 +8,7 @@ var annotated_dup =
         [ "CollectionExtensions", "classRunevision_1_1Common_1_1CollectionExtensions.html", null ],
         [ "Crd", "classRunevision_1_1Common_1_1Crd.html", null ],
         [ "DebugButton", "classRunevision_1_1Common_1_1DebugButton.html", null ],
-        [ "DebugDrawer", "classRunevision_1_1Common_1_1DebugDrawer.html", null ],
+        [ "DebugDrawer", "classRunevision_1_1Common_1_1DebugDrawer.html", "classRunevision_1_1Common_1_1DebugDrawer" ],
         [ "DebugFoldout", "classRunevision_1_1Common_1_1DebugFoldout.html", null ],
         [ "DebugOption", "classRunevision_1_1Common_1_1DebugOption.html", null ],
         [ "DebugOptions", "classRunevision_1_1Common_1_1DebugOptions.html", null ],
