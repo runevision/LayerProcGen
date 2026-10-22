@@ -67,7 +67,7 @@ def get_version():
 
 def build_upm_release():
     # Copy source data
-    ignored = shutil.ignore_patterns()
+    ignored = shutil.ignore_patterns("Godot*")
     shutil.copytree("Src/", UPM_DIR, ignore=ignored, dirs_exist_ok=True)
     shutil.copytree("Samples/", UPM_DIR + "Samples~/", ignore=ignored, dirs_exist_ok=True)
 

@@ -1,0 +1,17 @@
+{
+    "name": "Runevision.LayerProcGen",
+    "references": [
+        "GUID:af01629e909984b56b6ddac3cc8fe766",
+        "GUID:bdf51211cba1541cca26870e4d9c763d",
+        "GUID:97462eeaf6ea341848ff6b8b6119c1f0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

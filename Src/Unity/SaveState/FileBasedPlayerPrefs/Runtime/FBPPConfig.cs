@@ -1,3 +1,4 @@
+#if UNITY_2019_4_OR_NEWER
 using System;
 using UnityEngine;
 
@@ -23,3 +24,4 @@ public class FBPPConfig {
 
 }
 
+#endif
